@@ -62,13 +62,13 @@
   width: 64px;
   height: 64px;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
-  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 20%, transparent), color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 8%, transparent));
+  border: 1px solid color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 35%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.15rem;
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 20%, transparent);
   transition: all 0.3s ease;
 
   &.dwa-brand-has-image {
@@ -77,7 +77,7 @@
     border-radius: 20px;
     background: #FFFFFF !important;
     border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 12px 28px rgba(217, 70, 239, 0.18), 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 18%, transparent), 0 4px 10px rgba(0, 0, 0, 0.06) !important;
     padding: 0;
     overflow: hidden;
   }
@@ -258,14 +258,20 @@
     background: var(--dwa-brand-gradient) !important;
     border: none !important;
     color: #FFFFFF !important;
-    box-shadow: 0 10px 24px rgba(217, 70, 239, 0.32) !important;
+    box-shadow: var(
+      --dwa-button-shadow,
+      0 10px 24px color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 32%, transparent)
+    ) !important;
     font-weight: 600 !important;
     letter-spacing: -0.01em !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
     &:hover:not(:disabled) {
       transform: translateY(-1.5px);
-      box-shadow: 0 14px 30px rgba(217, 70, 239, 0.45) !important;
+      box-shadow: var(
+        --dwa-button-shadow,
+        0 14px 30px color-mix(in srgb, var(--dwa-brand-color, #3B82F6) 45%, transparent)
+      ) !important;
       filter: brightness(1.05);
     }
     &:active:not(:disabled) {
@@ -327,7 +333,7 @@
 .dwa-aurora-primary {
   width: 550px;
   height: 550px;
-  background: radial-gradient(circle, var(--dwa-aurora-primary, #3B82F6) 0%, rgba(59, 130, 246, 0) 70%);
+  background: radial-gradient(circle, var(--dwa-aurora-primary, #3B82F6) 0%, transparent 70%);
   top: -150px;
   left: 20%;
   animation: aurora-float-1 16s ease-in-out infinite alternate;
@@ -336,7 +342,7 @@
 .dwa-aurora-accent {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, var(--dwa-aurora-accent, #8B5CF6) 0%, rgba(139, 92, 246, 0) 70%);
+  background: radial-gradient(circle, var(--dwa-aurora-accent, #1D4ED8) 0%, transparent 70%);
   bottom: -150px;
   right: 20%;
   animation: aurora-float-2 20s ease-in-out infinite alternate;
@@ -637,7 +643,7 @@
       }
       &:focus {
         border-color: var(--dwa-brand-color, #D946EF) !important;
-        box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--dwa-brand-color, #D946EF) 18%, transparent) !important;
       }
       &::placeholder {
         color: #94A3B8 !important;
@@ -747,7 +753,7 @@
       }
       &:focus {
         border-color: var(--dwa-brand-color, #D946EF) !important;
-        box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.25) !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--dwa-brand-color, #D946EF) 25%, transparent) !important;
       }
       &::placeholder {
         color: #64748B !important;

@@ -171,6 +171,9 @@ export interface WebAuthConfig {
   /** Transforma o botão Entrar em pílula completa. Padrão: false. */
   buttonPill?: boolean;
 
+  /** Sombra customizada do botão de login (ex: '0 10px 24px rgba(59, 130, 246, 0.32)'). */
+  buttonBoxShadow?: string;
+
   /** Texto customizado do botão Entrar. */
   buttonText?: string;
 
@@ -308,6 +311,7 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     auroraAccentColor: config.auroraAccentColor ?? '',
     inputRadius: config.inputRadius ?? '',
     buttonPill: config.buttonPill ?? false,
+    buttonBoxShadow: config.buttonBoxShadow ?? '',
     buttonText: config.buttonText ?? '',
     showThemeToggle: config.showThemeToggle ?? false,
     showRememberMe: config.showRememberMe ?? true,

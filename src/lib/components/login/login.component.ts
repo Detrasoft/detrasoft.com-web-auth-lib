@@ -79,6 +79,9 @@ export class LoginComponent implements OnInit {
   /** Botão de login com estilo pílula completa. */
   @Input() buttonPill?: boolean;
 
+  /** Sombra customizada do botão de login. */
+  @Input() buttonBoxShadow?: string;
+
   /** Exibe seletor de tema Light / Dark mode no topo. */
   @Input() showThemeToggle?: boolean;
 
@@ -235,6 +238,10 @@ export class LoginComponent implements OnInit {
   readonly resolvedButtonPill = computed(() => {
     if (this.buttonPill !== undefined) return this.buttonPill;
     return this.config.buttonPill;
+  });
+
+  readonly resolvedButtonBoxShadow = computed(() => {
+    return this.buttonBoxShadow || this.config.buttonBoxShadow || '';
   });
 
   readonly resolvedShowThemeToggle = computed(() => {
