@@ -118,7 +118,10 @@ export class SoftwareService {
   private readonly config = inject(WEB_AUTH_CONFIG, { optional: true });
 
   listAll(): Observable<Software[]> {
-    const url = this.config?.softwareDataUrl ?? 'assets/data/software.json';
+    let url = this.config?.softwareDataUrl || '/assets/data/software.json';
+    if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+      url = `/${url}`;
+    }
     return this.http.get<any>(url).pipe(
       map(res => {
         const data = res?.data || res;

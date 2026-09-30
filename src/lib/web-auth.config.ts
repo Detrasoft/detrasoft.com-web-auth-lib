@@ -286,7 +286,7 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     backPath: config.backPath ?? '',
     pageSize: config.pageSize ?? 10,
     enableZoom: config.enableZoom ?? true,
-    softwareDataUrl: config.softwareDataUrl ?? 'assets/data/software.json',
+    softwareDataUrl: config.softwareDataUrl ?? '/assets/data/software.json',
     software,
     appName: config.appName ?? 'Detrasoft',
     appSubtitle: config.appSubtitle ?? 'Acesse sua conta para continuar',
