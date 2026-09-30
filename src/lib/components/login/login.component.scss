@@ -22,6 +22,11 @@
   background-repeat: no-repeat;
   color: #F8FAFC;
   transition: background 0.3s ease, color 0.3s ease;
+
+  &.dwa-bg-transparent,
+  &.dwa-theme-glass {
+    background: transparent !important;
+  }
 }
 
 /* ── Seletor de Tema no Topo ── */

@@ -170,7 +170,8 @@ export class LoginComponent implements OnInit {
   readonly resolvedShowAurora = computed(() => {
     if (this.showAurora !== undefined) return this.showAurora;
     if (this.config.showAurora !== undefined) return this.config.showAurora;
-    return this.resolvedBackground() !== 'transparent';
+    if (this.isGlass() || this.resolvedBackground() === 'transparent') return false;
+    return true;
   });
 
   readonly resolvedBrandGradient = computed(() => {
@@ -215,9 +216,16 @@ export class LoginComponent implements OnInit {
     } else if (themePref === 'dark') {
       this.currentTheme.set('dark');
     } else if (themePref === 'glass') {
-      const hasDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
       const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('tabfy-theme') : null;
-      this.currentTheme.set(stored === 'dark' || hasDark ? 'dark' : 'light');
+      if (stored === 'dark') {
+        this.currentTheme.set('dark');
+      } else {
+        this.currentTheme.set('light');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        }
+      }
     } else {
       const hasDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
       const hasLight = typeof document !== 'undefined' && document.documentElement.classList.contains('light');

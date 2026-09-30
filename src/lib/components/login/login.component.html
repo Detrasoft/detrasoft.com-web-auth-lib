@@ -4,6 +4,7 @@
   [class.dwa-theme-dark]="isDark()"
   [class.dwa-theme-glass]="isGlass()"
   [class.dwa-btn-pill]="resolvedButtonPill()"
+  [class.dwa-bg-transparent]="resolvedBackground() === 'transparent' || isGlass()"
   [ngClass]="customClass || config.customClass"
   [style.--dwa-custom-bg]="resolvedBackground()"
   [style.--dwa-brand-gradient]="resolvedBrandGradient()"
