@@ -185,16 +185,20 @@
     opacity: 0;
     width: 0;
     height: 0;
+    pointer-events: none;
   }
 
   .dwa-checkbox-custom {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s ease;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative;
 
     &::after {
       content: '';
@@ -214,8 +218,13 @@
     border-color: var(--dwa-brand-color, #3B82F6) !important;
 
     &::after {
-      opacity: 1;
+      opacity: 1 !important;
+      border-color: #FFFFFF !important;
     }
+  }
+
+  &:hover input[type="checkbox"]:not(:checked) + .dwa-checkbox-custom {
+    border-color: var(--dwa-brand-color, #3B82F6) !important;
   }
 }
 
@@ -239,6 +248,11 @@
 }
 
 .dwa-login-viewport.dwa-has-gradient {
+  .dwa-remember-me input[type="checkbox"]:checked + .dwa-checkbox-custom {
+    background: var(--dwa-brand-gradient) !important;
+    border-color: transparent !important;
+  }
+
   .dwa-submit-btn ::ng-deep button,
   .dwa-submit-btn button {
     background: var(--dwa-brand-gradient) !important;
@@ -435,9 +449,20 @@
   .dwa-remember-me {
     color: #94A3B8 !important;
 
-    .dwa-checkbox-custom {
+    input[type="checkbox"]:not(:checked) + .dwa-checkbox-custom {
       background: rgba(255, 255, 255, 0.05) !important;
       border: 1px solid #334155 !important;
+    }
+
+    input[type="checkbox"]:checked + .dwa-checkbox-custom {
+      background: var(--dwa-brand-color, #3B82F6) !important;
+      border-color: var(--dwa-brand-color, #3B82F6) !important;
+
+      &::after {
+        opacity: 1 !important;
+        border: solid #FFFFFF !important;
+        border-width: 0 2px 2px 0 !important;
+      }
     }
   }
 
@@ -527,9 +552,20 @@
   .dwa-remember-me {
     color: #475569 !important;
 
-    .dwa-checkbox-custom {
+    input[type="checkbox"]:not(:checked) + .dwa-checkbox-custom {
       background: #FFFFFF !important;
-      border: 1px solid #CBD5E1 !important;
+      border: 1.5px solid #CBD5E1 !important;
+    }
+
+    input[type="checkbox"]:checked + .dwa-checkbox-custom {
+      background: var(--dwa-brand-color, #2563EB) !important;
+      border-color: var(--dwa-brand-color, #2563EB) !important;
+
+      &::after {
+        opacity: 1 !important;
+        border: solid #FFFFFF !important;
+        border-width: 0 2px 2px 0 !important;
+      }
     }
   }
 
@@ -616,9 +652,20 @@
     .dwa-remember-me {
       color: #475569 !important;
 
-      .dwa-checkbox-custom {
+      input[type="checkbox"]:not(:checked) + .dwa-checkbox-custom {
         background: #FFFFFF !important;
-        border: 1px solid #CBD5E1 !important;
+        border: 1.5px solid #CBD5E1 !important;
+      }
+
+      input[type="checkbox"]:checked + .dwa-checkbox-custom {
+        background: var(--dwa-brand-color, #D946EF) !important;
+        border-color: var(--dwa-brand-color, #D946EF) !important;
+
+        &::after {
+          opacity: 1 !important;
+          border: solid #FFFFFF !important;
+          border-width: 0 2px 2px 0 !important;
+        }
       }
     }
 
@@ -714,9 +761,20 @@
     .dwa-remember-me {
       color: #94A3B8 !important;
 
-      .dwa-checkbox-custom {
+      input[type="checkbox"]:not(:checked) + .dwa-checkbox-custom {
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid #334155 !important;
+      }
+
+      input[type="checkbox"]:checked + .dwa-checkbox-custom {
+        background: var(--dwa-brand-color, #D946EF) !important;
+        border-color: var(--dwa-brand-color, #D946EF) !important;
+
+        &::after {
+          opacity: 1 !important;
+          border: solid #FFFFFF !important;
+          border-width: 0 2px 2px 0 !important;
+        }
       }
     }
 
