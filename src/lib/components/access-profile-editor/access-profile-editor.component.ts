@@ -221,26 +221,20 @@ export class AccessProfileEditorComponent implements OnInit {
             const sName = resolveLocalizedName(s.name, this.localeId) || s.nome || '';
             return { softwareNome: sName, funcoes };
           });
-        }
+        } else {
+          // Fallback: apenas caso o software.json não exista ou esteja vazio no projeto
+          const fallbackRoles = backendRoles ?? [];
+          if (fallbackRoles.length > 0) {
+            const fallbackNodes = this.buildUnmappedRoleNodes(fallbackRoles, leaves);
+            const blockTitle = this.config.appName
+              ? `Permissões — ${this.config.appName}`
+              : 'Permissões do Sistema';
 
-        // Incorpora roles do backend que não estão mapeadas no software.json (ou todas caso softwares esteja vazio)
-        const unmappedRoles = (backendRoles ?? []).filter(
-          r => r.code && !mappedRoleCodes.has(r.code),
-        );
-
-        if (unmappedRoles.length > 0) {
-          const fallbackNodes = this.buildUnmappedRoleNodes(unmappedRoles, leaves);
-          const blockTitle =
-            softwares && softwares.length > 0
-              ? 'Permissões do Sistema'
-              : this.config.appName
-                ? `Permissões — ${this.config.appName}`
-                : 'Permissões do Sistema';
-
-          fsList.push({
-            softwareNome: blockTitle,
-            funcoes: fallbackNodes,
-          });
+            fsList.push({
+              softwareNome: blockTitle,
+              funcoes: fallbackNodes,
+            });
+          }
         }
 
         this.funcoesSoftware.set(fsList);

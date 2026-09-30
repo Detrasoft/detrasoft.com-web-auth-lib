@@ -1,6 +1,6 @@
 {
   "name": "@detrasoft.com/web-auth",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "scripts": {
     "build": "ng-packagr -p ng-package.json"
   },
