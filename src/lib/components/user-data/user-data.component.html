@@ -1,0 +1,279 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        [eyebrow]="eyebrow()"
+        [title]="title()"
+        [description]="description()"
+        [backLink]="backPath"
+      />
+    }
+
+    @if (loading()) {
+      <dwa-state mode="loading" loadingLabel="Carregando dados do usuário" />
+    } @else if (error()) {
+      <dwa-state mode="error" [message]="error()!" (retry)="goBack()" />
+    } @else {
+      <div class="dwa-stack">
+        <!-- ── Card 1: Identidade & Avatar ─────────────────────────────────── -->
+        <section class="dwa-card dwa-form">
+          <div class="dwa-card__head">
+            <div class="dwa-card__icon">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+              <span class="dwa-card__eyebrow">Identificação</span>
+              <h2 class="dwa-card__title">Informações Pessoais & Foto</h2>
+            </div>
+          </div>
+
+          <div class="dwa-avatar-hero">
+            <div class="dwa-avatar-hero__frame">
+              @if (currentAvatarUrl() && !avatarImgError()) {
+                <img
+                  [src]="currentAvatarUrl()"
+                  alt="Avatar do usuário"
+                  class="dwa-avatar-hero__img"
+                  (error)="avatarImgError.set(true)"
+                />
+              } @else {
+                <div class="dwa-avatar-hero__fallback">
+                  {{ userInitials() }}
+                </div>
+              }
+              @if (uploadingAvatar()) {
+                <div class="dwa-avatar-hero__overlay">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i>
+                </div>
+              }
+            </div>
+
+            <div class="dwa-avatar-hero__info">
+              <div class="dwa-avatar-hero__title-row">
+                <strong>{{ userFullName() }}</strong>
+                @if (subscriptionBadge()) {
+                  <span class="dwa-chip">
+                    {{ subscriptionBadge() }}
+                  </span>
+                }
+              </div>
+              <p class="dwa-avatar-hero__hint">
+                Formatos aceitos: JPG, PNG ou WEBP. Tamanho máximo recomendado: 10MB.
+              </p>
+
+              <div class="dwa-avatar-hero__actions">
+                <input
+                  #avatarInput
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/jpg"
+                  (change)="onAvatarFileSelect($event)"
+                  style="display: none"
+                />
+                <ds-button
+                  variant="primary"
+                  type="button"
+                  [disabled]="uploadingAvatar()"
+                  (click)="avatarInput.click()"
+                >
+                  <i class="fa-solid fa-camera me-1"></i>
+                  <span>Alterar foto de perfil</span>
+                </ds-button>
+
+                @if (currentAvatarUrl() && !avatarImgError()) {
+                  <ds-button
+                    variant="ghost"
+                    type="button"
+                    [disabled]="uploadingAvatar()"
+                    (click)="removeAvatar()"
+                  >
+                    <i class="fa-solid fa-trash me-1"></i>
+                    <span>Remover foto</span>
+                  </ds-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="dwa-grid-2">
+            <ds-input
+              label="Nome"
+              placeholder="Informe seu primeiro nome"
+              [required]="true"
+              [value]="firstName()"
+              (valueChange)="firstName.set($event)"
+            />
+
+            <ds-input
+              label="Sobrenome"
+              placeholder="Informe seu sobrenome"
+              [required]="true"
+              [value]="lastName()"
+              (valueChange)="lastName.set($event)"
+            />
+          </div>
+
+          <!-- ── Rodapé do Card Identificação (exibido apenas quando houver alterações) ── -->
+          @if (hasIdentificationChanges() || saving()) {
+            <div class="dwa-form-actions">
+              <ds-button
+                variant="ghost"
+                type="button"
+                [disabled]="saving()"
+                (click)="cancelChanges()"
+              >
+                Descartar alterações
+              </ds-button>
+
+              <ds-button
+                variant="primary"
+                type="button"
+                [loading]="saving()"
+                [disabled]="saving()"
+                (click)="saveUserData()"
+              >
+                Salvar alterações
+              </ds-button>
+            </div>
+          }
+        </section>
+
+        <!-- ── Card 2: Preferências de Exibição & Zoom ─────────────────────── -->
+        @if (enableZoom()) {
+          <section class="dwa-card dwa-form">
+            <div class="dwa-card__head">
+              <div class="dwa-card__icon dwa-card__icon--zoom">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+              </div>
+              <div>
+                <span class="dwa-card__eyebrow">Aparência</span>
+                <h2 class="dwa-card__title">Escala e Zoom do Aplicativo</h2>
+              </div>
+            </div>
+
+            <p class="dwa-card__desc">
+              Personalize a densidade visual e o tamanho dos elementos da interface para garantir máximo conforto visual em telas grandes ou notebooks.
+            </p>
+
+            <div class="dwa-zoom-panel">
+              <div class="dwa-zoom-panel__controls">
+                <button
+                  type="button"
+                  class="dwa-icon-btn dwa-zoom-btn"
+                  (click)="onZoomOut()"
+                  title="Diminuir zoom da interface"
+                  aria-label="Diminuir zoom"
+                >
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+
+                <div class="dwa-zoom-panel__display" title="Escala atual">
+                  <span class="dwa-zoom-panel__pct">{{ zoomService.zoomPercentage() }}%</span>
+                  <small class="dwa-zoom-panel__label">Zoom</small>
+                </div>
+
+                <button
+                  type="button"
+                  class="dwa-icon-btn dwa-zoom-btn"
+                  (click)="onZoomIn()"
+                  title="Aumentar zoom da interface"
+                  aria-label="Aumentar zoom"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+
+                <ds-button
+                  variant="ghost"
+                  type="button"
+                  (click)="onResetZoom()"
+                  [disabled]="zoomService.zoomPercentage() === 100"
+                  title="Restaurar padrão (100%)"
+                >
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  <span>Restaurar 100%</span>
+                </ds-button>
+
+                @if (savingZoom()) {
+                  <div class="dwa-chip">
+                    <i class="fa-solid fa-circle-notch fa-spin me-1"></i>
+                    <span>Salvando preferência...</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </section>
+        }
+
+        <!-- ── Card 3: Segurança e Acesso ──────────────────────────────────── -->
+        <section class="dwa-card dwa-form">
+          <div class="dwa-card__head">
+            <div class="dwa-card__icon dwa-card__icon--security">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <span class="dwa-card__eyebrow">Acesso e Credenciais</span>
+              <h2 class="dwa-card__title">Segurança da Conta</h2>
+            </div>
+          </div>
+
+          <div class="dwa-security-boxes">
+            <!-- Box 1: E-mail de Acesso -->
+            <div class="dwa-security-box">
+              <div class="dwa-security-box__info">
+                <strong>E-mail de acesso</strong>
+                <p>
+                  {{ email() || 'Nenhum e-mail cadastrado' }}
+                  — Endereço utilizado para autenticação e notificações.
+                </p>
+              </div>
+
+              @if (canChangeEmail()) {
+                <a [routerLink]="changeEmailPath" class="dwa-security-link">
+                  <ds-button variant="primary" type="button">
+                    <i class="fa-solid fa-envelope me-2"></i>
+                    <span>Alterar e-mail</span>
+                  </ds-button>
+                </a>
+              } @else {
+                <div class="dwa-chip">
+                  <i class="fa-solid fa-link me-1"></i>
+                  <span>Login social ({{ socialProviderName() }})</span>
+                </div>
+              }
+            </div>
+
+            <!-- Box 2: Senha de Acesso -->
+            <div class="dwa-security-box">
+              <div class="dwa-security-box__info">
+                <strong>Senha de acesso</strong>
+                <p>Mantenha sua conta segura utilizando uma senha forte com letras, números e caracteres especiais.</p>
+              </div>
+
+              <a [routerLink]="changePasswordPath" class="dwa-security-link">
+                <ds-button variant="primary" type="button">
+                  <i class="fa-solid fa-key me-2"></i>
+                  <span>Alterar senha</span>
+                </ds-button>
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ── Componente Híbrido de Recorte ds-image-crop ───────────────────────── -->
+<ds-image-crop
+  [(visible)]="showImageCrop"
+  [imageFile]="selectedAvatarFile"
+  title="Recortar Foto de Perfil"
+  shape="circle"
+  [outputWidth]="512"
+  [outputHeight]="512"
+  outputFormat="image/png"
+  outputFileName="avatar-512x512.png"
+  applyLabel="Aplicar Recorte"
+  cancelLabel="Cancelar"
+  (cropComplete)="onCropComplete($event)"
+  (cropCancel)="onCropCancel()"
+/>

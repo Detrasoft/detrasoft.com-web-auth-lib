@@ -1,0 +1,196 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        eyebrow="Regras do workspace"
+        [title]="title()"
+        description="Dê um nome ao perfil e escolha quais permissões ele concede. Perfis são vinculados a usuários do tipo Padrão."
+        [backLink]="profilesBasePath"
+      />
+    }
+
+    @if (loading()) {
+      <dwa-state mode="loading" loadingLabel="Carregando perfil" />
+    } @else if (error()) {
+      <dwa-state mode="error" [message]="error()!" (retry)="goBack()" />
+    } @else {
+
+      @if (readOnly()) {
+        <div class="dwa-note dwa-note--info">
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          <p>
+            Este é um perfil padrão do sistema. Suas permissões não podem ser alteradas.
+            Todos os workspaces têm acesso a ele automaticamente.
+          </p>
+        </div>
+      }
+      <form class="dwa-card dwa-form" [formGroup]="form" (ngSubmit)="save()">
+        <ds-input
+          label="Nome do perfil"
+          formControlName="name"
+          placeholder="Ex.: Gerente de Operações"
+          [required]="true"
+          [error]="fieldError()"
+          [hint]="readOnly() ? '' : 'Use um nome que descreva a função da pessoa no workspace.'"
+        />
+      </form>
+
+      <section class="dwa-card dwa-roles">
+        <div class="dwa-roles__head">
+          <div class="dwa-section-title">
+            <strong>Permissões de acesso</strong>
+            <small>{{ readOnly() ? 'Permissões concedidas por este perfil.' : 'Marque tudo que este perfil pode fazer.' }}</small>
+          </div>
+          @if (totalCount() > 0) {
+            <span
+              class="dwa-roles__counter"
+              [class.dwa-roles__counter--none]="selectedCount() === 0"
+              aria-live="polite"
+            >
+              {{ selectedCount() }} de {{ totalCount() }}
+            </span>
+          }
+        </div>
+
+        @if (loadingRoles()) {
+          <dwa-state mode="loading" loadingLabel="Carregando permissões" />
+        } @else if (rolesError()) {
+          <dwa-state mode="error" [message]="rolesError()!" (retry)="loadRoles()" />
+        } @else if (hasNoRoles()) {
+          <div class="dwa-note dwa-note--warning">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <p>
+              Nenhuma permissão cadastrada neste ambiente. O catálogo vem do
+              authorization-server — sem ele não é possível montar um perfil.
+            </p>
+          </div>
+        } @else {
+          <div class="dwa-roles__toolbar">
+            <label class="dwa-search__field dwa-roles__search">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <input
+                type="search"
+                autocomplete="off"
+                placeholder="Filtrar permissões"
+                aria-label="Filtrar permissões"
+                [value]="filterTerm()"
+                (input)="onFilterInput($event)"
+              />
+              @if (isFiltered()) {
+                <button
+                  type="button"
+                  class="dwa-search__clear"
+                  aria-label="Limpar filtro"
+                  (click)="clearFilter()"
+                >
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              }
+            </label>
+
+            @if (!readOnly()) {
+              <button type="button" class="dwa-roles__bulk" (click)="toggleAllVisible()">
+                @if (isFiltered()) {
+                  Alternar visíveis
+                } @else {
+                  {{ allSelected() ? 'Desmarcar todas' : 'Marcar todas' }}
+                }
+              </button>
+            }
+          </div>
+
+          @if (hasNoVisibleNodes()) {
+            <p class="dwa-roles__empty">
+              Nenhuma permissão corresponde a “{{ filterTerm() }}”.
+            </p>
+          } @else {
+            <div class="dwa-roles__tree">
+              @for (fs of visibleFuncoesSoftware(); track fs.softwareNome) {
+                <div class="software-block">
+                  <div class="software-block__header">
+                    <i class="fa-solid fa-cube" aria-hidden="true"></i>
+                    <span>{{ fs.softwareNome }}</span>
+                  </div>
+                  <div class="software-block__tree">
+                    <ds-tree
+                      selectionMode="checkbox"
+                      [value]="fs.funcoes"
+                      [selection]="selectedNodes()"
+                      (selectionChange)="onSelectionChange($event)"
+                    />
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (isFiltered() && selectedCount() > 0) {
+            <p class="dwa-roles__hint">
+              O filtro não desfaz seleções: permissões marcadas fora do filtro continuam válidas.
+            </p>
+          }
+
+          @if (selectedCount() === 0) {
+            <div class="dwa-note dwa-note--warning">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+              <p>Um perfil sem permissões não concede acesso a nada. Marque ao menos uma.</p>
+            </div>
+          }
+        }
+
+        @if (!readOnly()) {
+          <div class="dwa-form-actions">
+            <ds-button variant="ghost" type="button" [disabled]="saving()" (click)="goBack()">
+              Cancelar
+            </ds-button>
+            <ds-button
+              variant="primary"
+              type="button"
+              [loading]="saving()"
+              [disabled]="saving() || hasNoRoles()"
+              (click)="save()"
+            >
+              {{ isEditMode() ? 'Salvar alterações' : 'Criar perfil' }}
+            </ds-button>
+          </div>
+        } @else {
+          <div class="dwa-form-actions">
+            <ds-button variant="ghost" type="button" (click)="goBack()">
+              Voltar
+            </ds-button>
+          </div>
+        }
+      </section>
+
+      @if (isEditMode() && !readOnly()) {
+        <section class="dwa-card dwa-danger-zone">
+          <div class="dwa-danger-zone__row">
+            <div>
+              <strong class="dwa-danger-zone__label">Excluir perfil</strong>
+              <p class="dwa-danger-zone__text">
+                Usuários do tipo Padrão que dependiam apenas deste perfil ficarão sem nenhuma
+                permissão.
+              </p>
+            </div>
+            <ds-button variant="danger" type="button" (click)="askDelete()">
+              Excluir perfil
+            </ds-button>
+          </div>
+        </section>
+      }
+    }
+  </div>
+</div>
+
+<dwa-confirm
+  [isOpen]="pendingDelete()"
+  [danger]="true"
+  [loading]="deleting()"
+  icon="fa-solid fa-shield-xmark"
+  title="Excluir perfil de acesso"
+  message="O perfil será removido permanentemente e desvinculado de todos os usuários."
+  confirmText="Excluir perfil"
+  loadingText="Excluindo…"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+/>

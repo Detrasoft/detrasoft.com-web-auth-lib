@@ -1,0 +1,198 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        [eyebrow]="eyebrow()"
+        [title]="title()"
+        [description]="description()"
+        [backLink]="userDataBasePath"
+      />
+    }
+
+    @if (loading()) {
+      <div class="dwa-card">
+        <dwa-state
+          mode="loading"
+          title="Carregando dados da conta"
+          message="Aguarde um instante..."
+        />
+      </div>
+    } @else if (error()) {
+      <div class="dwa-card">
+        <dwa-state
+          mode="error"
+          title="Erro ao carregar dados"
+          [message]="error()!"
+          (retry)="loadCurrentUser()"
+        />
+      </div>
+    } @else if (isSocialNonOtp()) {
+      <!-- Usuário social diferente de OTP: alteração bloqueada -->
+      <div class="dwa-card dwa-form">
+        <div class="dwa-card__head">
+          <div class="dwa-card__icon dwa-card__icon--danger">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <span class="dwa-card__eyebrow">Autenticação Externa</span>
+            <h2 class="dwa-card__title">Conta Vinculada via {{ providerName() }}</h2>
+          </div>
+        </div>
+
+        <div class="dwa-note dwa-note--warning">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>
+            <strong>Alteração de e-mail não disponível</strong>
+            <p>
+              Sua conta está vinculada a um provedor externo (<strong>{{ providerName() }}</strong>).
+              O endereço de e-mail é gerenciado pelo próprio provedor e não pode ser alterado através deste painel.
+            </p>
+          </div>
+        </div>
+
+        <div class="dwa-grid-2">
+          <ds-input
+            label="E-mail vinculado"
+            [value]="currentEmail()"
+            [disabled]="true"
+            hint="Endereço de e-mail associado à conta externa."
+          />
+
+          <ds-input
+            label="Provedor de login"
+            [value]="providerName()"
+            [disabled]="true"
+            hint="Autenticação gerenciada pelo provedor social."
+          />
+        </div>
+
+        <div class="dwa-form-actions">
+          <ds-button
+            variant="ghost"
+            type="button"
+            (click)="goBack()"
+          >
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            <span>Voltar</span>
+          </ds-button>
+        </div>
+      </div>
+    } @else {
+      <!-- Formulário de troca de e-mail para usuários válidos (comum ou OTP) -->
+      <form class="dwa-card dwa-form" (ngSubmit)="submitChangeEmail()">
+        <div class="dwa-card__head">
+          <div class="dwa-card__icon dwa-card__icon--security">
+            <i class="fa-solid fa-envelope"></i>
+          </div>
+          <div>
+            <span class="dwa-card__eyebrow">Acesso e Identificação</span>
+            <h2 class="dwa-card__title">Novo E-mail de Acesso</h2>
+          </div>
+        </div>
+
+        <div class="dwa-email-fields">
+          <ds-input
+            label="E-mail atual"
+            [value]="currentEmail()"
+            [disabled]="true"
+            hint="Seu endereço de e-mail cadastrado atualmente no sistema."
+          />
+
+          <div class="dwa-field-group">
+            <ds-input
+              type="email"
+              label="Novo e-mail"
+              placeholder="Digite o novo endereço de e-mail"
+              [required]="true"
+              [value]="newEmail()"
+              (valueChange)="onNewEmailChange($event)"
+            />
+
+            @if (emailChecking()) {
+              <div class="dwa-note dwa-note--info">
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                <p>Verificando disponibilidade do e-mail...</p>
+              </div>
+            } @else if (emailTaken()) {
+              <div class="dwa-note dwa-note--danger">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <p>Este e-mail inválido e não pode ser utilizado.</p>
+              </div>
+            } @else if (emailAvailable() && isFormatValid() && !isSameAsCurrent()) {
+              <div class="dwa-note dwa-note--success">
+                <i class="fa-solid fa-circle-check"></i>
+                <p>E-mail disponível para uso.</p>
+              </div>
+            } @else if (isSameAsCurrent()) {
+              <div class="dwa-note dwa-note--warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>O novo e-mail não pode ser idêntico ao e-mail atual.</p>
+              </div>
+            }
+          </div>
+
+          <div class="dwa-field-group">
+            <ds-input
+              type="email"
+              label="Confirmar novo e-mail"
+              placeholder="Repita o novo endereço de e-mail"
+              [required]="true"
+              [value]="confirmNewEmail()"
+              (valueChange)="confirmNewEmail.set($event)"
+            />
+
+            @if (emailMismatch()) {
+              <div class="dwa-note dwa-note--danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>A confirmação do e-mail não confere.</p>
+              </div>
+            }
+          </div>
+
+          @if (provider() !== 'OTP') {
+            <div class="dwa-password-field">
+              <ds-input
+                [type]="showPassword ? 'text' : 'password'"
+                label="Senha atual"
+                placeholder="Digite sua senha para autorizar a alteração"
+                [required]="true"
+                [value]="password()"
+                (valueChange)="password.set($event)"
+                hint="Por segurança, informe sua senha de acesso para confirmar a alteração."
+              />
+              <button
+                type="button"
+                class="dwa-password-toggle"
+                (click)="showPassword = !showPassword"
+                [title]="showPassword ? 'Ocultar senha' : 'Ver senha'"
+              >
+                <i class="fa-solid {{ showPassword ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="dwa-form-actions">
+          <ds-button
+            variant="ghost"
+            type="button"
+            [disabled]="submitting()"
+            (click)="goBack()"
+          >
+            Cancelar
+          </ds-button>
+
+          <ds-button
+            variant="primary"
+            type="submit"
+            [loading]="submitting()"
+            [disabled]="submitting() || !isFormValid()"
+          >
+            <i class="fa-solid fa-envelope-circle-check me-2"></i>
+            <span>Confirmar alteração</span>
+          </ds-button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

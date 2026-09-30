@@ -1,0 +1,181 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        eyebrow="Regras do workspace"
+        [title]="labels.profilesTitle"
+        [description]="labels.profilesDescription"
+        [backLink]="backPath"
+        [hasActions]="true"
+      >
+        <ds-button header-actions variant="primary" (click)="newProfile()">
+          <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
+          Novo perfil
+        </ds-button>
+      </dwa-page-header>
+    }
+
+    <section class="dwa-card dwa-search">
+      <label class="dwa-search__field">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="search"
+          autocomplete="off"
+          placeholder="Buscar perfil por nome"
+          aria-label="Buscar perfil por nome"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+        />
+        @if (isFiltered()) {
+          <button type="button" class="dwa-search__clear" aria-label="Limpar busca" (click)="clearSearch()">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        }
+      </label>
+      <p class="dwa-search__hint">
+        Busque pelo nome do perfil de acesso.
+      </p>
+    </section>
+
+    @if (loading()) {
+      <dwa-state mode="loading" loadingLabel="Carregando perfis de acesso" />
+    } @else if (error()) {
+      <dwa-state mode="error" [message]="error()!" (retry)="load()" />
+    } @else if (isEmpty()) {
+      <dwa-state
+        mode="empty"
+        icon="fa-solid fa-shield-halved"
+        [title]="isFiltered() ? 'Nenhum perfil encontrado' : 'Nenhum perfil de acesso cadastrado'"
+        [message]="
+          isFiltered()
+            ? 'Revise o termo buscado ou limpe o filtro para ver todos os perfis.'
+            : 'Crie perfis para agrupar permissões e vinculá-los aos usuários do tipo Padrão.'
+        "
+      >
+        <div state-actions>
+          @if (isFiltered()) {
+            <ds-button variant="outline" (click)="clearSearch()">Limpar busca</ds-button>
+          } @else {
+            <ds-button variant="primary" (click)="newProfile()">Criar primeiro perfil</ds-button>
+          }
+        </div>
+      </dwa-state>
+    } @else {
+      <section class="dwa-card dwa-list-card">
+        <ds-list
+          listId="web-auth-profile-list"
+          trackByKey="id"
+          [data]="profiles()"
+          [pageSize]="pageSize"
+          [serverPagination]="true"
+          [totalRecords]="totalRecords()"
+          emptyMessage="Nenhum perfil encontrado."
+          actionsLabel="Ações"
+          (pageChange)="onPageChange($event)"
+          (rowClick)="edit($event)"
+        >
+          <ds-list-column key="name" label="Perfil">
+            <ng-template let-row="row">
+              <div class="dwa-profile-cell">
+                <span class="dwa-profile-cell__icon" [class.dwa-profile-cell__icon--default]="isDefault(row)" aria-hidden="true">
+                  <i [class]="isDefault(row) ? 'fa-solid fa-lock' : 'fa-solid fa-shield-halved'"></i>
+                </span>
+                <span class="dwa-profile-cell__body">
+                  <span class="dwa-profile-cell__name-row">
+                    <strong>{{ row.name }}</strong>
+                    @if (isDefault(row)) {
+                      <span class="dwa-badge dwa-badge--default">Padrão do sistema</span>
+                    }
+                  </span>
+                  @if (hasRoleDetails(row)) {
+                    <small>
+                      {{ roleCount(row) }}
+                      {{ roleCount(row) === 1 ? 'permissão' : 'permissões' }}
+                    </small>
+                  }
+                </span>
+              </div>
+            </ng-template>
+          </ds-list-column>
+
+          @if (hasRolesColumn()) {
+            <ds-list-column key="roles" label="Permissões">
+              <ng-template let-row="row">
+                @if (roleCount(row) === 0) {
+                  <span class="dwa-role-warning">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    Sem permissões
+                  </span>
+                } @else {
+                  <div class="dwa-role-chips">
+                    @for (role of rolePreview(row); track role) {
+                      <span class="dwa-chip">{{ role }}</span>
+                    }
+                    @if (hiddenRoleCount(row) > 0) {
+                      <span class="dwa-chip dwa-chip--more">+{{ hiddenRoleCount(row) }}</span>
+                    }
+                  </div>
+                }
+              </ng-template>
+            </ds-list-column>
+          }
+
+          <ds-list-column key="actions" label="Ações" width="130px" align="right">
+            <ng-template let-row="row">
+              <div class="dwa-actions" (click)="$event.stopPropagation()">
+                @if (!isDefault(row)) {
+                  <button
+                    type="button"
+                    class="dwa-icon-btn"
+                    title="Editar perfil"
+                    aria-label="Editar perfil"
+                    (click)="edit(row)"
+                  >
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="dwa-icon-btn dwa-icon-btn--danger"
+                    title="Excluir perfil"
+                    aria-label="Excluir perfil"
+                    (click)="askDelete(row)"
+                  >
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="dwa-icon-btn"
+                    title="Visualizar perfil"
+                    aria-label="Visualizar perfil"
+                    (click)="edit(row)"
+                  >
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                  </button>
+                }
+              </div>
+            </ng-template>
+          </ds-list-column>
+        </ds-list>
+      </section>
+    }
+  </div>
+</div>
+
+<dwa-confirm
+  [isOpen]="!!pendingDelete()"
+  [danger]="true"
+  [loading]="deleting()"
+  icon="fa-solid fa-shield-xmark"
+  title="Excluir perfil de acesso"
+  [message]="'O perfil &quot;' + pendingDeleteName() + '&quot; será removido permanentemente.'"
+  confirmText="Excluir perfil"
+  loadingText="Excluindo…"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+>
+  <p class="dwa-confirm-hint">
+    Usuários do tipo <strong>Padrão</strong> que dependiam apenas deste perfil ficarão sem nenhuma
+    permissão até serem vinculados a outro.
+  </p>
+</dwa-confirm>

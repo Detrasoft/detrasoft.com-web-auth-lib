@@ -1,0 +1,97 @@
+@use '../../styles/web-auth-shared' as *;
+
+:host {
+  display: block;
+}
+
+.dwa-profile-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.dwa-profile-cell__icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  font-size: 0.85rem;
+  background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.14));
+  color: var(--dwa-primary-strong, #5b44b0);
+
+  &--default {
+    background: var(--dwa-success-soft, rgba(16, 185, 129, 0.12));
+    color: var(--dwa-success-strong, #059669);
+  }
+}
+
+.dwa-profile-cell__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    font-size: 0.93rem;
+    font-weight: 700;
+    color: var(--dwa-text, #2a2440);
+  }
+
+  small {
+    font-size: 0.78rem;
+    color: var(--dwa-text-muted, #6b6483);
+  }
+}
+
+.dwa-profile-cell__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dwa-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.dwa-badge--default {
+  background: var(--dwa-success-soft, rgba(16, 185, 129, 0.12));
+  color: var(--dwa-success-strong, #059669);
+}
+
+.dwa-role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dwa-chip--more {
+  background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.14));
+  color: var(--dwa-primary-strong, #5b44b0);
+  font-weight: 700;
+}
+
+.dwa-role-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--dwa-warning-strong, #a16207);
+}
+
+.dwa-list-card ::ng-deep .ds-list__table td:last-child {
+  padding-right: 0.5rem;
+}
+

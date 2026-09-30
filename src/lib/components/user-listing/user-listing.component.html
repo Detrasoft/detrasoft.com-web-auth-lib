@@ -1,0 +1,182 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        eyebrow="Regras do workspace"
+        [title]="labels.usersTitle"
+        [description]="labels.usersDescription"
+        [backLink]="backPath"
+        [hasActions]="true"
+      >
+        <ds-button header-actions variant="primary" (click)="newUser()">
+          <i class="fa-solid fa-user-plus me-2" aria-hidden="true"></i>
+          Novo usuário
+        </ds-button>
+      </dwa-page-header>
+    }
+
+    <section class="dwa-card dwa-search">
+      <label class="dwa-search__field">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="search"
+          autocomplete="off"
+          placeholder="Buscar por nome ou e-mail"
+          aria-label="Buscar por nome ou e-mail"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+        />
+        @if (isFiltered()) {
+          <button type="button" class="dwa-search__clear" aria-label="Limpar busca" (click)="clearSearch()">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        }
+      </label>
+      <p class="dwa-search__hint">
+        Busque por nome ou e-mail.
+      </p>
+    </section>
+
+    @if (loading()) {
+      <dwa-state mode="loading" loadingLabel="Carregando usuários" />
+    } @else if (error()) {
+      <dwa-state mode="error" [message]="error()!" (retry)="load()" />
+    } @else if (isEmpty()) {
+      <dwa-state
+        mode="empty"
+        icon="fa-solid fa-users"
+        [title]="isFiltered() ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'"
+        [message]="
+          isFiltered()
+            ? 'Revise o termo buscado ou limpe o filtro para ver todos os participantes.'
+            : 'Convide a primeira pessoa para colaborar neste workspace.'
+        "
+      >
+        <div state-actions>
+          @if (isFiltered()) {
+            <ds-button variant="outline" (click)="clearSearch()">Limpar busca</ds-button>
+          } @else {
+            <ds-button variant="primary" (click)="newUser()">Novo usuário</ds-button>
+          }
+        </div>
+      </dwa-state>
+    } @else {
+      <section class="dwa-card dwa-list-card">
+        <ds-list
+          listId="web-auth-user-list"
+          trackByKey="id"
+          [data]="users()"
+          [pageSize]="pageSize"
+          [serverPagination]="true"
+          [totalRecords]="totalRecords()"
+          emptyMessage="Nenhum usuário encontrado."
+          actionsLabel="Ações"
+          (pageChange)="onPageChange($event)"
+          (rowClick)="edit($event)"
+        >
+          <ds-list-column key="firstName" label="Usuário">
+            <ng-template let-row="row">
+              <div class="dwa-user">
+                <span class="dwa-user__avatar" aria-hidden="true">
+                  @if (row.urlImg) {
+                    <img [src]="row.urlImg" alt="" />
+                  } @else {
+                    {{ initials(row) }}
+                  }
+                </span>
+                <span class="dwa-user__identity">
+                  <strong>{{ fullName(row) }}</strong>
+                  <small>{{ row.email }}</small>
+                </span>
+              </div>
+            </ng-template>
+          </ds-list-column>
+
+          <ds-list-column key="type" label="Tipo" width="140px">
+            <ng-template let-row="row">
+              <span class="dwa-chip">{{ typeLabel(row.type) }}</span>
+            </ng-template>
+          </ds-list-column>
+
+          <ds-list-column key="inactive" label="Status" width="130px">
+            <ng-template let-row="row">
+              <span
+                class="dwa-status"
+                [class.dwa-status--active]="isActive(row)"
+                [class.dwa-status--inactive]="!isActive(row)"
+              >
+                {{ isActive(row) ? 'Ativo' : 'Inativo' }}
+              </span>
+            </ng-template>
+          </ds-list-column>
+
+          <ds-list-column key="actions" label="Ações" width="190px" align="right">
+            <ng-template let-row="row">
+              <div class="dwa-actions" (click)="$event.stopPropagation()">
+                <button
+                  type="button"
+                  class="dwa-icon-btn"
+                  title="Editar usuário"
+                  aria-label="Editar usuário"
+                  (click)="edit(row)"
+                >
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                </button>
+                <button
+                  type="button"
+                  class="dwa-icon-btn"
+                  [title]="isActive(row) ? 'Inativar acesso' : 'Reativar acesso'"
+                  [attr.aria-label]="isActive(row) ? 'Inativar acesso' : 'Reativar acesso'"
+                  [disabled]="processingId() === row.id"
+                  (click)="toggleActive(row)"
+                >
+                  @if (processingId() === row.id) {
+                    <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+                  } @else {
+                    <i
+                      class="fa-solid"
+                      [class.fa-user-slash]="isActive(row)"
+                      [class.fa-user-check]="!isActive(row)"
+                      aria-hidden="true"
+                    ></i>
+                  }
+                </button>
+                <button
+                  type="button"
+                  class="dwa-icon-btn dwa-icon-btn--danger"
+                  title="Excluir usuário"
+                  aria-label="Excluir usuário"
+                  (click)="askDelete(row)"
+                >
+                  <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            </ng-template>
+          </ds-list-column>
+        </ds-list>
+      </section>
+    }
+  </div>
+</div>
+
+<dwa-confirm
+  [isOpen]="!!pendingDelete()"
+  [danger]="true"
+  [loading]="deleting()"
+  icon="fa-solid fa-user-xmark"
+  title="Excluir usuário"
+  [message]="
+    'Esta ação remove ' +
+    fullName(pendingDelete()) +
+    ' permanentemente do workspace e não pode ser desfeita.'
+  "
+  confirmText="Excluir usuário"
+  loadingText="Excluindo…"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+>
+  <p class="dwa-confirm-hint">
+    Se a intenção é apenas suspender o acesso, prefira <strong>inativar</strong> — o histórico do
+    usuário é preservado e o acesso pode ser devolvido depois.
+  </p>
+</dwa-confirm>

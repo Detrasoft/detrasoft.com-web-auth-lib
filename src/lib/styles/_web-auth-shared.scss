@@ -1,0 +1,486 @@
+/*
+ * Camada visual compartilhada pelas telas da @detrasoft.com/web-auth.
+ *
+ * Só usa custom properties `--dwa-*` com fallback literal, então a lib tem
+ * aparência coerente sozinha e se integra ao design system do app hospedeiro
+ * quando ele redireciona esses tokens (ver THEMING.md).
+ *
+ * Importe com `@use '../../styles/web-auth-shared' as *;` no SCSS do componente.
+ */
+
+.dwa-page {
+  min-height: 100%;
+  padding: 1rem 1rem 4rem;
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: var(--dwa-text, #2a2440);
+}
+
+.dwa-container {
+  width: 100%;
+  max-width: var(--dwa-container-max, 1080px);
+  margin: 0 auto;
+}
+
+.dwa-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.dwa-card {
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background: var(--dwa-surface, #ffffff);
+  border-radius: var(--dwa-radius-lg, 20px);
+  box-shadow: var(--dwa-shadow, 0 10px 30px rgba(42, 36, 64, 0.08));
+  border: 1px solid var(--dwa-border, rgba(137, 111, 244, 0.14));
+  color: var(--dwa-text, #2a2440);
+}
+
+.dwa-card__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dwa-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--dwa-radius-md, 14px);
+  display: grid;
+  place-items: center;
+  background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.14));
+  color: var(--dwa-primary, #896ff4);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+
+  &--zoom {
+    background: var(--dwa-info-soft, rgba(56, 189, 248, 0.16));
+    color: var(--dwa-info, #38bdf8);
+  }
+
+  &--security {
+    background: var(--dwa-warning-soft, rgba(245, 158, 11, 0.16));
+    color: var(--dwa-warning, #f59e0b);
+  }
+}
+
+.dwa-card__eyebrow {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--dwa-primary-strong, #5b44b0);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.dwa-card__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dwa-text, #2a2440);
+}
+
+.dwa-card__desc {
+  margin: 0;
+  color: var(--dwa-text-muted, #6b6483);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.dwa-list-card {
+  padding: 0.75rem;
+
+  @media (max-width: 640px) {
+    padding: 0.5rem;
+  }
+
+  .ds-list__card {
+    background: var(--dwa-surface-sunken, #f3f0fb) !important;
+    border: 1px solid var(--dwa-border, rgba(137, 111, 244, 0.18)) !important;
+    border-radius: var(--dwa-radius-md, 16px) !important;
+    color: var(--dwa-text, #2a2440) !important;
+
+    .ds-list__card-header {
+      border-bottom-color: var(--dwa-border, rgba(137, 111, 244, 0.14)) !important;
+    }
+
+    .ds-list__card-title {
+      color: var(--dwa-text, #2a2440) !important;
+    }
+
+    .ds-list__card-field {
+      background: var(--dwa-surface, #ffffff) !important;
+      border: 1px solid var(--dwa-border, rgba(137, 111, 244, 0.1)) !important;
+      border-radius: 10px !important;
+    }
+
+    .ds-list__card-label {
+      color: var(--dwa-text-muted, #6b6483) !important;
+    }
+
+    .ds-list__card-value {
+      color: var(--dwa-text, #2a2440) !important;
+    }
+
+    .ds-list__card-actions {
+      border-top-color: var(--dwa-border, rgba(137, 111, 244, 0.14)) !important;
+    }
+  }
+}
+
+/* ── Busca ─────────────────────────────────────────────────────────────── */
+
+.dwa-search {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.dwa-search__field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 46px;
+  padding: 0 0.85rem;
+  border-radius: var(--dwa-radius-md, 14px);
+  background: var(--dwa-surface-sunken, #f3f0fb);
+  color: var(--dwa-text-muted, #6b6483);
+
+  &:focus-within {
+    outline: 2px solid var(--dwa-primary, #896ff4);
+    outline-offset: 1px;
+  }
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--dwa-text, #2a2440);
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+}
+
+.dwa-search__clear {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+
+  &:hover {
+    background: var(--dwa-surface, #ffffff);
+  }
+}
+
+.dwa-search__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--dwa-text-soft, #9a92b5);
+}
+
+/* ── Identidade do usuário ─────────────────────────────────────────────── */
+
+.dwa-user {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.dwa-user__avatar {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.14));
+  color: var(--dwa-primary-strong, #5b44b0);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.dwa-user__identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    font-size: 0.93rem;
+    font-weight: 700;
+    color: var(--dwa-text, #2a2440);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    font-size: 0.78rem;
+    color: var(--dwa-text-muted, #6b6483);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ── Chips e status ────────────────────────────────────────────────────── */
+
+.dwa-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--dwa-surface-sunken, #f3f0fb);
+  color: var(--dwa-text-muted, #6b6483);
+}
+
+.dwa-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--active {
+    background: var(--dwa-success-soft, rgba(34, 197, 94, 0.12));
+    color: var(--dwa-success-strong, #16a34a);
+  }
+
+  &--inactive {
+    background: var(--dwa-warning-soft, rgba(234, 179, 8, 0.14));
+    color: var(--dwa-warning-strong, #a16207);
+  }
+}
+
+/* ── Ações em linha ────────────────────────────────────────────────────── */
+
+.dwa-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.dwa-icon-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  font-size: 0.82rem;
+  border-radius: 10px;
+  background: var(--dwa-surface-sunken, #f3f0fb);
+  color: var(--dwa-text-muted, #6b6483);
+  transition: background var(--dwa-transition, 180ms ease), color var(--dwa-transition, 180ms ease);
+
+  &:hover:not(:disabled) {
+    background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.14));
+    color: var(--dwa-primary-strong, #5b44b0);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &--danger:hover:not(:disabled) {
+    background: var(--dwa-danger-soft, rgba(248, 113, 113, 0.14));
+    color: var(--dwa-danger-strong, #b91c1c);
+  }
+}
+
+/* ── Formulários ───────────────────────────────────────────────────────── */
+
+.dwa-form {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.dwa-grid-2 {
+  display: grid;
+  gap: 1rem;
+}
+
+.dwa-section-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0 0 0.35rem;
+
+  strong {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--dwa-text, #2a2440);
+  }
+
+  small {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--dwa-text-muted, #6b6483);
+  }
+}
+
+.dwa-eyebrow {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dwa-primary-strong, #5b44b0);
+}
+
+.dwa-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1.5rem;
+
+  > :first-child {
+    margin-right: auto;
+  }
+
+  > :last-child {
+    margin-left: auto;
+  }
+}
+
+.dwa-confirm-hint {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  border-radius: var(--dwa-radius-md, 14px);
+  background: var(--dwa-surface-sunken, #f3f0fb);
+  color: var(--dwa-text-muted, #6b6483);
+}
+
+/* ── Aviso informativo ────────────────────────────────────────────────── */
+
+.dwa-note {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--dwa-radius-md, 14px);
+  background: var(--dwa-info-soft, rgba(96, 165, 250, 0.12));
+  color: var(--dwa-info-strong, #1d4ed8);
+
+  i {
+    flex: 0 0 auto;
+    margin-top: 0.15rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
+
+.dwa-note--warning {
+  background: var(--dwa-warning-soft, rgba(234, 179, 8, 0.14));
+  color: var(--dwa-warning-strong, #a16207);
+}
+
+.dwa-note--danger {
+  background: var(--dwa-danger-soft, rgba(248, 113, 113, 0.14));
+  color: var(--dwa-danger-strong, #b91c1c);
+}
+
+.dwa-note--success {
+  background: var(--dwa-success-soft, rgba(34, 197, 94, 0.12));
+  color: var(--dwa-success-strong, #16a34a);
+}
+
+.dwa-divider {
+  height: 1px;
+  border: 0;
+  margin: 0.25rem 0;
+  background: var(--dwa-border, rgba(42, 36, 64, 0.1));
+}
+
+/* ── Zona de risco ────────────────────────────────────────────────────── */
+
+.dwa-danger-zone {
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid var(--dwa-danger-soft, rgba(248, 113, 113, 0.35));
+}
+
+.dwa-danger-zone__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.dwa-danger-zone__label {
+  display: block;
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--dwa-text, #2a2440);
+}
+
+.dwa-danger-zone__text {
+  margin: 0.2rem 0 0;
+  max-width: 52ch;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--dwa-text-muted, #6b6483);
+}
+
+/* ── Responsivo ───────────────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .dwa-page {
+    padding: 1.5rem 1.5rem 4rem;
+  }
+
+  .dwa-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .dwa-card {
+    padding: 1rem;
+    border-radius: var(--dwa-radius-md, 16px);
+  }
+}

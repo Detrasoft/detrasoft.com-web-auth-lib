@@ -1,0 +1,13 @@
+@use '../../styles/web-auth-shared' as *;
+
+:host {
+  display: block;
+}
+
+/*
+ * O `<ds-list>` já traz tabela no desktop e cards no mobile. Aqui só ajustamos
+ * o espaçamento da célula de ações para os botões de ícone não colarem na borda.
+ */
+.dwa-list-card ::ng-deep .ds-list__table td:last-child {
+  padding-right: 0.5rem;
+}

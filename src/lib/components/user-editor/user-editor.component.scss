@@ -1,0 +1,110 @@
+@use '../../styles/web-auth-shared' as *;
+
+:host {
+  display: block;
+}
+
+.dwa-field-group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.dwa-note--field {
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--dwa-radius-sm, 10px);
+
+  i {
+    margin-top: 0.1rem;
+    font-size: 0.85rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
+.dwa-profile-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dwa-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  border-radius: var(--dwa-radius-md, 14px);
+  background: var(--dwa-surface-sunken, #f3f0fb);
+  border: 1.5px solid transparent;
+  transition:
+    border-color var(--dwa-transition, 180ms ease),
+    background var(--dwa-transition, 180ms ease);
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: var(--dwa-primary-soft, rgba(137, 111, 244, 0.35));
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--dwa-primary, #896ff4);
+    outline-offset: 2px;
+  }
+
+  &--on {
+    background: var(--dwa-primary-soft, rgba(137, 111, 244, 0.12));
+    border-color: var(--dwa-primary, #896ff4);
+  }
+}
+
+.dwa-profile__check {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  font-size: 0.68rem;
+  background: var(--dwa-surface, #ffffff);
+  border: 1.5px solid var(--dwa-border-color, rgba(42, 36, 64, 0.18));
+  color: transparent;
+
+  .dwa-profile--on & {
+    background: var(--dwa-primary, #896ff4);
+    border-color: var(--dwa-primary, #896ff4);
+    color: var(--dwa-on-primary, #ffffff);
+  }
+}
+
+.dwa-profile__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--dwa-text, #2a2440);
+  }
+
+  small {
+    font-size: 0.78rem;
+    color: var(--dwa-text-muted, #6b6483);
+  }
+}
+
+@media (min-width: 640px) {
+  .dwa-profile-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}

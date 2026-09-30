@@ -1,0 +1,188 @@
+<div class="dwa-page">
+  <div class="dwa-container dwa-stack">
+    @if (showHeader()) {
+      <dwa-page-header
+        eyebrow="Regras do workspace"
+        [title]="title()"
+        [description]="description()"
+        [backLink]="usersBasePath"
+      />
+    }
+
+    @if (loading()) {
+      <dwa-state mode="loading" loadingLabel="Carregando usuário" />
+    } @else if (error()) {
+      <dwa-state mode="error" [message]="error()!" (retry)="goBack()" />
+    } @else {
+      <form class="dwa-card dwa-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="dwa-section-title">
+          <strong>Dados cadastrais</strong>
+          <small>
+            @if (isEditMode()) {
+              Atualize as informações cadastrais e o nível de acesso do usuário.
+            } @else {
+              O e-mail informado receberá o convite para definir a senha de acesso.
+            }
+          </small>
+        </div>
+
+        <div class="dwa-grid-2">
+          <ds-input
+            label="Nome"
+            formControlName="firstName"
+            autocomplete="given-name"
+            [required]="true"
+            [error]="fieldError('firstName')"
+          />
+          <ds-input
+            label="Sobrenome"
+            formControlName="lastName"
+            autocomplete="family-name"
+            [required]="true"
+            [error]="fieldError('lastName')"
+          />
+        </div>
+
+        <div class="dwa-grid-2">
+          <div class="dwa-field-group">
+            <ds-input
+              label="E-mail"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              [required]="true"
+              [error]="fieldError('email')"
+              (valueChange)="onEmailChange($event)"
+              hint="Utilizado para autenticação e notificações do workspace."
+            />
+            @if (emailChecking()) {
+              <div class="dwa-note dwa-note--field">
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+                <p>Verificando disponibilidade do e-mail...</p>
+              </div>
+            } @else if (emailTaken()) {
+              <div class="dwa-note dwa-note--danger dwa-note--field">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <p>Este e-mail não pode ser utilizado.</p>
+              </div>
+            } @else if (emailAvailable()) {
+              <div class="dwa-note dwa-note--success dwa-note--field">
+                <i class="fa-solid fa-circle-check"></i>
+                <p>E-mail disponível para uso.</p>
+              </div>
+            }
+          </div>
+          <ds-dropdown
+            label="Tipo de usuário"
+            formControlName="type"
+            optionLabel="label"
+            optionValue="value"
+            [options]="typeOptions"
+            [filter]="false"
+            [required]="true"
+            hint="Administrador tem acesso total. Padrão tem o acesso definido pelos perfis."
+          />
+        </div>
+
+        @if (isStandardUser()) {
+          <div class="dwa-divider"></div>
+
+          <div class="dwa-section-title">
+            <strong>Perfis de acesso</strong>
+            <small>
+              Perfis definem o que a pessoa pode fazer. Selecione os perfis de acesso vinculados a este usuário.
+            </small>
+          </div>
+
+          @if (profiles().length === 0) {
+            <div class="dwa-note">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+              <p>
+                Nenhum perfil de acesso cadastrado ainda. Você pode salvar o usuário agora e vincular
+                um perfil depois, em <strong>Ajustes › Perfis de acesso</strong>.
+              </p>
+            </div>
+          } @else {
+            <div class="dwa-profile-grid" role="group" aria-label="Perfis de acesso">
+              @for (profile of profiles(); track profile.id) {
+                <label class="dwa-profile" [class.dwa-profile--on]="isProfileSelected(profile.id)">
+                  <input
+                    type="checkbox"
+                    [checked]="isProfileSelected(profile.id)"
+                    (change)="toggleProfile(profile.id)"
+                  />
+                  <span class="dwa-profile__check" aria-hidden="true">
+                    <i class="fa-solid fa-check"></i>
+                  </span>
+                  <span class="dwa-profile__body">
+                    <strong>{{ profile.name }}</strong>
+                    @if (profile.roles && profile.roles.length > 0) {
+                      <small>
+                        {{ profile.roles.length }}
+                        {{ profile.roles.length === 1 ? 'permissão' : 'permissões' }}
+                      </small>
+                    }
+                  </span>
+                </label>
+              }
+            </div>
+          }
+
+          @if (missingProfile()) {
+            <div class="dwa-note dwa-note--warning">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              <p>
+                Usuários do tipo <strong>Padrão</strong> sem nenhum perfil entram no sistema sem
+                permissão alguma. Selecione ao menos um perfil.
+              </p>
+            </div>
+          }
+        }
+
+        <div class="dwa-form-actions">
+          <ds-button variant="ghost" type="button" [disabled]="saving()" (click)="goBack()">
+            Cancelar
+          </ds-button>
+          <ds-button
+            variant="primary"
+            type="submit"
+            [loading]="saving()"
+            [disabled]="saving() || emailChecking() || emailTaken()"
+          >
+            {{ isEditMode() ? 'Salvar alterações' : 'Criar e enviar convite' }}
+          </ds-button>
+        </div>
+      </form>
+
+      @if (isEditMode()) {
+        <section class="dwa-card dwa-danger-zone">
+          <div class="dwa-danger-zone__row">
+            <div>
+              <strong class="dwa-danger-zone__label">Excluir usuário</strong>
+              <p class="dwa-danger-zone__text">
+                Remove o cadastro permanentemente. Para apenas suspender o acesso, use
+                <strong>inativar</strong> na listagem.
+              </p>
+            </div>
+            <ds-button variant="danger" type="button" (click)="askDelete()">
+              Excluir usuário
+            </ds-button>
+          </div>
+        </section>
+      }
+    }
+  </div>
+</div>
+
+<dwa-confirm
+  [isOpen]="pendingDelete()"
+  [danger]="true"
+  [loading]="deleting()"
+  icon="fa-solid fa-user-xmark"
+  title="Excluir usuário"
+  message="Esta ação remove o cadastro permanentemente do workspace e não pode ser desfeita."
+  confirmText="Excluir usuário"
+  loadingText="Excluindo…"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+/>
