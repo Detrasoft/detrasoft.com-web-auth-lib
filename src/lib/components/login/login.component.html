@@ -1,0 +1,109 @@
+<div class="dwa-login-viewport">
+  <!-- Efeito Aurora e Luz de Fundo -->
+  <div class="dwa-aurora-wrap" aria-hidden="true">
+    <div class="dwa-aurora dwa-aurora-primary"></div>
+    <div class="dwa-aurora dwa-aurora-accent"></div>
+  </div>
+
+  <div class="dwa-login-container">
+    <!-- Card Principal de Login -->
+    <div class="dwa-login-card">
+      <!-- Cabeçalho / Identidade Visual -->
+      <div class="dwa-card-header">
+        <div class="dwa-brand-icon-wrap">
+          <i [class]="resolvedAppIcon()" class="dwa-brand-icon"></i>
+        </div>
+        <h1 class="dwa-brand-title">{{ resolvedAppTitle() }}</h1>
+        <p class="dwa-brand-subtitle">{{ resolvedAppSubtitle() }}</p>
+      </div>
+
+      <!-- Banner de Erro -->
+      <div *ngIf="errorMessage()" class="dwa-error-banner" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form (ngSubmit)="onSubmit()" class="dwa-login-form" autocomplete="on">
+        <div class="dwa-field-group">
+          <ds-input
+            label="E-mail de acesso"
+            type="email"
+            inputId="dwa-login-email"
+            autocomplete="email"
+            placeholder="seu.email@empresa.com"
+            [required]="true"
+            [value]="email()"
+            (valueChange)="email.set($event)"
+          ></ds-input>
+        </div>
+
+        <div class="dwa-field-group dwa-password-group">
+          <ds-input
+            label="Senha"
+            [type]="showPass() ? 'text' : 'password'"
+            inputId="dwa-login-password"
+            autocomplete="current-password"
+            placeholder="Digite sua senha"
+            [required]="true"
+            [value]="password()"
+            (valueChange)="password.set($event)"
+          ></ds-input>
+          <button
+            type="button"
+            class="dwa-password-toggle"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPass() ? 'Ocultar senha' : 'Exibir senha'"
+            tabindex="-1"
+          >
+            <i class="fa-solid" [class.fa-eye]="!showPass()" [class.fa-eye-slash]="showPass()"></i>
+          </button>
+        </div>
+
+        <div class="dwa-form-options">
+          <label *ngIf="showRememberMe" class="dwa-remember-me">
+            <input
+              type="checkbox"
+              [checked]="remember()"
+              (change)="remember.set($any($event.target).checked)"
+            />
+            <span class="dwa-checkbox-custom"></span>
+            <span class="dwa-checkbox-label">{{ labels.loginRememberMe }}</span>
+          </label>
+
+          <a
+            *ngIf="forgotPasswordUrl"
+            [routerLink]="forgotPasswordUrl"
+            class="dwa-forgot-link"
+          >
+            {{ labels.loginForgotPassword }}
+          </a>
+        </div>
+
+        <div class="dwa-form-actions">
+          <ds-button
+            variant="primary"
+            size="lg"
+            [fullWidth]="true"
+            [loading]="loading()"
+            type="submit"
+            class="dwa-submit-btn"
+          >
+            {{ loading() ? 'Autenticando...' : labels.loginSubmitBtn }}
+          </ds-button>
+        </div>
+      </form>
+
+      <!-- Rodapé do Card -->
+      <div *ngIf="registerUrl" class="dwa-card-footer">
+        <span class="dwa-footer-text">Não tem uma conta?</span>
+        <a [routerLink]="registerUrl" class="dwa-footer-link">Criar conta</a>
+      </div>
+    </div>
+
+    <!-- Rodapé Detrasoft -->
+    <footer class="dwa-page-footer">
+      <span>Plataforma Segura • Powered by <strong>DetraSoft</strong></span>
+    </footer>
+  </div>
+</div>

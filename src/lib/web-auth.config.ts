@@ -21,6 +21,11 @@ export interface WebAuthLabels {
   changeEmailTitle: string;
   changeEmailEyebrow: string;
   changeEmailDescription: string;
+  loginTitle: string;
+  loginSubtitle: string;
+  loginSubmitBtn: string;
+  loginRememberMe: string;
+  loginForgotPassword: string;
 }
 
 /**
@@ -94,6 +99,24 @@ export interface WebAuthConfig {
   /** Caminho do arquivo JSON com o catálogo de software e permissões. Padrão: `assets/data/software.json`. */
   softwareDataUrl?: string;
 
+  /** Identificador do produto/software (ex: 'note', 'form', 'task'). Padrão: 'detrasoft'. */
+  software?: string;
+
+  /** Nome do produto exibido no login. Padrão: 'Detrasoft'. */
+  appName?: string;
+
+  /** Subtítulo do login. Padrão: 'Acesse sua conta para continuar'. */
+  appSubtitle?: string;
+
+  /** Ícone FontAwesome do produto. Padrão: 'fa-solid fa-shield-halved'. */
+  appIcon?: string;
+
+  /** Path de login customizado. Se omitido, usa `/auth/${software}/login`. */
+  loginPath?: string;
+
+  /** Rota de redirecionamento após login bem-sucedido. Padrão: '/'. */
+  redirectUrlAfterLogin?: string;
+
   /** Sobrescrita parcial dos textos. */
   labels?: Partial<WebAuthLabels>;
 }
@@ -125,12 +148,18 @@ export const WEB_AUTH_DEFAULT_LABELS: WebAuthLabels = {
   changeEmailEyebrow: 'Segurança',
   changeEmailDescription:
     'Informe seu novo endereço de e-mail utilizado para acesso e notificações.',
+  loginTitle: 'Entrar na sua conta',
+  loginSubtitle: 'Informe suas credenciais para continuar.',
+  loginSubmitBtn: 'Entrar',
+  loginRememberMe: 'Lembrar de mim neste dispositivo',
+  loginForgotPassword: 'Esqueceu a senha?',
 };
 
 export const WEB_AUTH_CONFIG = new InjectionToken<ResolvedWebAuthConfig>('WEB_AUTH_CONFIG');
 
 /** Aplica os padrões sobre a configuração informada pelo app hospedeiro. */
 export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConfig {
+  const software = config.software ?? 'detrasoft';
   return {
     baseUrl: config.baseUrl,
     apiPath: config.apiPath ?? '/authorization-server',
@@ -145,6 +174,12 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     pageSize: config.pageSize ?? 10,
     enableZoom: config.enableZoom ?? true,
     softwareDataUrl: config.softwareDataUrl ?? 'assets/data/software.json',
+    software,
+    appName: config.appName ?? 'Detrasoft',
+    appSubtitle: config.appSubtitle ?? 'Acesse sua conta para continuar',
+    appIcon: config.appIcon ?? 'fa-solid fa-shield-halved',
+    loginPath: config.loginPath ?? `/auth/${software}/login`,
+    redirectUrlAfterLogin: config.redirectUrlAfterLogin ?? '/',
     userSession: config.userSession,
     labels: { ...WEB_AUTH_DEFAULT_LABELS, ...config.labels },
   };

@@ -118,3 +118,23 @@ export const USER_DATA_ROUTES: Routes = [
     data: { title: 'Alterar e-mail' },
   },
 ];
+
+/**
+ * Rota de "Login" compartilhado.
+ *
+ * ```ts
+ * {
+ *   path: 'login',
+ *   loadChildren: () => import('@detrasoft.com/web-auth').then(m => m.LOGIN_ROUTES),
+ *   data: { title: 'Entrar' },
+ * }
+ * ```
+ */
+export const LOGIN_ROUTES: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./components/login/login.component').then(m => m.LoginComponent),
+    data: { title: 'Entrar' },
+  },
+];

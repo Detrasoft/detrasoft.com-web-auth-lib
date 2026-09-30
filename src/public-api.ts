@@ -15,8 +15,10 @@ export * from './lib/web-auth.routes';
 export * from './lib/models/api-response.model';
 export * from './lib/models/user-access.model';
 export * from './lib/models/access-profile.model';
+export * from './lib/models/auth.model';
 
 /* ── Services ── */
+export * from './lib/services/auth.service';
 export * from './lib/services/user-access.service';
 export * from './lib/services/access-profile.service';
 export * from './lib/services/software.service';
@@ -26,6 +28,7 @@ export * from './lib/services/zoom.service';
 export * from './lib/utils/notification.util';
 
 /* ── Components ── */
+export { LoginComponent } from './lib/components/login/login.component';
 export { UserListingComponent } from './lib/components/user-listing/user-listing.component';
 export { UserEditorComponent } from './lib/components/user-editor/user-editor.component';
 export { AccessProfileListingComponent } from './lib/components/access-profile-listing/access-profile-listing.component';
