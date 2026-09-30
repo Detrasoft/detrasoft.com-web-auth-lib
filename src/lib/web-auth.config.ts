@@ -135,23 +135,74 @@ export interface WebAuthConfig {
   /** Habilita ou desabilita luzes de fundo aurora. Padrão: true. */
   showAurora?: boolean;
 
+  /** Cor primária da luz aurora (ex: '#3B82F6'). */
+  auroraPrimaryColor?: string;
+
+  /** Cor secundária/sotaque da luz aurora (ex: '#8B5CF6'). */
+  auroraAccentColor?: string;
+
   /** Gradiente da marca (ex: 'linear-gradient(135deg, #FF655B 0%, #D946EF 50%, #7C3AED 100%)'). */
   brandGradient?: string;
 
   /** Cor de destaque principal (ex: '#D946EF'). */
   brandColor?: string;
 
-  /** Raio das bordas do card (ex: '28px'). */
+  /** Raio das bordas do card (ex: '28px', '20px'). */
   cardRadius?: string;
 
   /** Largura máxima do card. Padrão: '440px'. */
   cardMaxWidth?: string;
 
+  /** Cor de fundo customizada do card (ex: 'rgba(19, 25, 38, 0.9)'). */
+  cardBackground?: string;
+
+  /** Borda customizada do card (ex: '1px solid rgba(255, 255, 255, 0.1)'). */
+  cardBorder?: string;
+
+  /** Desfoque de fundo do card (ex: '24px', '0px'). */
+  cardBackdropBlur?: string;
+
+  /** Sombra customizada do card. */
+  cardBoxShadow?: string;
+
+  /** Raio das bordas dos campos de input (ex: '12px', '9999px'). */
+  inputRadius?: string;
+
   /** Transforma o botão Entrar em pílula completa. Padrão: false. */
   buttonPill?: boolean;
 
+  /** Texto customizado do botão Entrar. */
+  buttonText?: string;
+
   /** Exibe chave seletora Light / Dark mode na tela de login. Padrão: false. */
   showThemeToggle?: boolean;
+
+  /** Exibe o checkbox "Lembrar de mim". Padrão: true. */
+  showRememberMe?: boolean;
+
+  /** Exibe o link "Esqueceu a senha?". Padrão: true se forgotPasswordUrl existir. */
+  showForgotPassword?: boolean;
+
+  /** URL para recuperação de senha. */
+  forgotPasswordUrl?: string;
+
+  /** URL para registro/cadastro de nova conta. */
+  registerUrl?: string;
+
+  /** Texto do link de cadastro. Padrão: 'Criar conta'. */
+  registerText?: string;
+
+  /** Texto de introdução do cadastro. Padrão: 'Não tem uma conta?'. */
+  registerPrompt?: string;
+
+  /** Exibe o rodapé no final da página de login. Padrão: true. */
+  showFooter?: boolean;
+
+  /** Texto de segurança do rodapé. Padrão: 'Plataforma Segura'. */
+  footerText?: string;
+
+  /** Nome da empresa no rodapé. Padrão: 'DetraSoft'. */
+  footerCompany?: string;
 
   /** Classe CSS customizada opcional. */
   customClass?: string;
@@ -231,8 +282,25 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     brandColor: config.brandColor ?? '',
     cardRadius: config.cardRadius ?? '',
     cardMaxWidth: config.cardMaxWidth ?? '440px',
+    cardBackground: config.cardBackground ?? '',
+    cardBorder: config.cardBorder ?? '',
+    cardBackdropBlur: config.cardBackdropBlur ?? '',
+    cardBoxShadow: config.cardBoxShadow ?? '',
+    auroraPrimaryColor: config.auroraPrimaryColor ?? '',
+    auroraAccentColor: config.auroraAccentColor ?? '',
+    inputRadius: config.inputRadius ?? '',
     buttonPill: config.buttonPill ?? false,
+    buttonText: config.buttonText ?? '',
     showThemeToggle: config.showThemeToggle ?? false,
+    showRememberMe: config.showRememberMe ?? true,
+    showForgotPassword: config.showForgotPassword ?? false,
+    forgotPasswordUrl: config.forgotPasswordUrl ?? '',
+    registerUrl: config.registerUrl ?? '',
+    registerText: config.registerText ?? 'Criar conta',
+    registerPrompt: config.registerPrompt ?? 'Não tem uma conta?',
+    showFooter: config.showFooter ?? true,
+    footerText: config.footerText ?? 'Plataforma Segura',
+    footerCompany: config.footerCompany ?? 'DetraSoft',
     customClass: config.customClass ?? '',
     userSession: config.userSession,
     labels: { ...WEB_AUTH_DEFAULT_LABELS, ...config.labels },

@@ -23,100 +23,9 @@
   color: #F8FAFC;
   transition: background 0.3s ease, color 0.3s ease;
 
-  &.dwa-bg-transparent,
-  &.dwa-theme-glass {
+  &.dwa-bg-transparent {
     background: transparent !important;
   }
-}
-
-/* ── Seletor de Tema no Topo ── */
-.dwa-theme-toggle-bar {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.75rem;
-  z-index: 10;
-}
-
-.dwa-theme-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  .dwa-pill-opt {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    border-radius: 9999px;
-    font-size: 0.775rem;
-    font-weight: 600;
-    color: #64748B;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &.active {
-      background: #FFFFFF;
-      color: #0F172A;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-  }
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.9);
-  }
-}
-
-/* ── Fundo Atmosférico Aurora (Dark) ── */
-.dwa-aurora-wrap {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.dwa-aurora {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.25;
-  will-change: transform;
-}
-
-.dwa-aurora-primary {
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, #3B82F6 0%, rgba(59, 130, 246, 0) 70%);
-  top: -150px;
-  left: 20%;
-  animation: aurora-float-1 16s ease-in-out infinite alternate;
-}
-
-.dwa-aurora-accent {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #8B5CF6 0%, rgba(139, 92, 246, 0) 70%);
-  bottom: -150px;
-  right: 20%;
-  animation: aurora-float-2 20s ease-in-out infinite alternate;
-}
-
-@keyframes aurora-float-1 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(60px, 80px) scale(1.15); }
-}
-
-@keyframes aurora-float-2 {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-80px, -60px) scale(1.1); }
 }
 
 /* ── Container Central ── */
@@ -131,19 +40,13 @@
   gap: 1.5rem;
 }
 
-/* ── Card Base (Padrão Dark) ── */
+/* ── Card Base ── */
 .dwa-login-card {
   width: 100%;
-  background: rgba(19, 25, 38, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--dwa-card-radius, 20px);
   padding: 2.5rem 2.25rem;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45),
-              0 0 0 1px rgba(255, 255, 255, 0.05);
   box-sizing: border-box;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Header ── */
@@ -169,9 +72,12 @@
   transition: all 0.3s ease;
 
   &.dwa-brand-has-image {
-    background: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: #FFFFFF !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 12px 28px rgba(217, 70, 239, 0.18), 0 4px 10px rgba(0, 0, 0, 0.06) !important;
     padding: 0;
     overflow: hidden;
   }
@@ -194,13 +100,11 @@
   font-size: 1.65rem;
   font-weight: 700;
   margin: 0 0 0.4rem 0;
-  color: #F8FAFC;
   letter-spacing: -0.02em;
 }
 
 .dwa-brand-subtitle {
   font-size: 0.875rem;
-  color: #94A3B8;
   margin: 0;
   line-height: 1.45;
 }
@@ -275,7 +179,6 @@
   gap: 0.5rem;
   cursor: pointer;
   user-select: none;
-  color: #94A3B8;
 
   input[type="checkbox"] {
     position: absolute;
@@ -288,8 +191,6 @@
     width: 16px;
     height: 16px;
     border-radius: 4px;
-    border: 1px solid #334155;
-    background: rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -309,21 +210,16 @@
   }
 
   input[type="checkbox"]:checked + .dwa-checkbox-custom {
-    background: var(--dwa-brand-color, #3B82F6);
-    border-color: var(--dwa-brand-color, #3B82F6);
+    background: var(--dwa-brand-color, #3B82F6) !important;
+    border-color: var(--dwa-brand-color, #3B82F6) !important;
 
     &::after {
       opacity: 1;
     }
   }
-
-  &:hover .dwa-checkbox-custom {
-    border-color: #475569;
-  }
 }
 
 .dwa-forgot-link {
-  color: var(--dwa-brand-color, #60A5FA);
   text-decoration: none;
   transition: color 0.15s;
 
@@ -342,8 +238,7 @@
   width: 100%;
 }
 
-/* Customização do botão com gradiente de marca e pílula */
-.dwa-login-viewport[style*="--dwa-brand-gradient"] {
+.dwa-login-viewport.dwa-has-gradient {
   .dwa-submit-btn ::ng-deep button,
   .dwa-submit-btn button {
     background: var(--dwa-brand-gradient) !important;
@@ -380,16 +275,10 @@
   gap: 0.4rem;
   margin-top: 1.75rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.85rem;
 }
 
-.dwa-footer-text {
-  color: #94A3B8;
-}
-
 .dwa-footer-link {
-  color: var(--dwa-brand-color, #60A5FA);
   text-decoration: none;
   font-weight: 500;
 
@@ -401,61 +290,230 @@
 /* ── Footer da Página ── */
 .dwa-page-footer {
   font-size: 0.775rem;
-  color: #64748B;
   text-align: center;
+}
 
-  strong {
-    color: #94A3B8;
+/* ── Fundo Atmosférico Aurora (Dark) ── */
+.dwa-aurora-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dwa-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.25;
+  will-change: transform;
+}
+
+.dwa-aurora-primary {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, var(--dwa-aurora-primary, #3B82F6) 0%, rgba(59, 130, 246, 0) 70%);
+  top: -150px;
+  left: 20%;
+  animation: aurora-float-1 16s ease-in-out infinite alternate;
+}
+
+.dwa-aurora-accent {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--dwa-aurora-accent, #8B5CF6) 0%, rgba(139, 92, 246, 0) 70%);
+  bottom: -150px;
+  right: 20%;
+  animation: aurora-float-2 20s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-float-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(60px, 80px) scale(1.15); }
+}
+
+@keyframes aurora-float-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-80px, -60px) scale(1.1); }
+}
+
+/* ── Seletor de Tema no Topo ── */
+.dwa-theme-toggle-bar {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  z-index: 10;
+}
+
+.dwa-theme-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  .dwa-pill-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: #64748B;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.active {
+      background: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.9);
   }
 }
 
 /* ==========================================================================
-   TEMA GLASS & LIGHT (Identidade Tabfy e Apps com Glassmorphism)
+   TEMA 1: DARK OBSIDIAN (DutFy Notes, DutFy Task)
+   Garante card preto/obsidian, inputs pretos com texto branco,
+   e rodapé legível
    ========================================================================== */
 
-.dwa-login-viewport.dwa-theme-glass,
-.dwa-login-viewport.dwa-theme-light {
-  color: #0F172A;
+.dwa-login-viewport.dwa-theme-dark:not(.dwa-theme-glass) {
+  background: var(--dwa-custom-bg, #0B0F17);
+  color: #F8FAFC !important;
 
   .dwa-login-card {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.92);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08),
-                inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
+    background: var(--dwa-card-bg, rgba(19, 25, 38, 0.88)) !important;
+    backdrop-filter: var(--dwa-card-blur, blur(20px)) !important;
+    -webkit-backdrop-filter: var(--dwa-card-blur, blur(20px)) !important;
+    border: var(--dwa-card-border, 1px solid rgba(255, 255, 255, 0.08)) !important;
+    border-radius: var(--dwa-card-radius, 20px) !important;
+    box-shadow: var(--dwa-card-shadow, 0 20px 45px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05)) !important;
   }
 
   .dwa-brand-title {
-    color: #0F172A;
+    color: #F8FAFC !important;
   }
 
   .dwa-brand-subtitle {
-    color: #475569;
+    color: #94A3B8 !important;
   }
 
-  /* Variáveis nos inputs do detra-ng */
-  --input-bg: rgba(255, 255, 255, 0.95);
-  --input-border: #E2E8F0;
-  --input-border-hover: #CBD5E1;
-  --input-border-focus: var(--dwa-brand-color, #D946EF);
-  --input-focus-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18);
-  --input-text: #0F172A;
-  --input-label: #334155;
-  --input-placeholder: #94A3B8;
-
-  /* Força acabamento em inputs caso detra-ng use classes diretas */
   ::ng-deep .ds-input__field {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    border-color: #E2E8F0 !important;
+    background-color: rgba(26, 33, 50, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #F8FAFC !important;
+    border-radius: var(--dwa-input-radius, 10px) !important;
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.28) !important;
+    }
+    &:focus {
+      border-color: var(--dwa-brand-color, #3B82F6) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    }
+    &::placeholder {
+      color: #64748B !important;
+    }
+  }
+
+  ::ng-deep .ds-input__label {
+    color: #CBD5E1 !important;
+  }
+
+  .dwa-remember-me {
+    color: #94A3B8 !important;
+
+    .dwa-checkbox-custom {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid #334155 !important;
+    }
+  }
+
+  .dwa-forgot-link {
+    color: var(--dwa-brand-color, #60A5FA) !important;
+  }
+
+  .dwa-password-toggle {
+    color: #64748B !important;
+    &:hover {
+      color: #94A3B8 !important;
+    }
+  }
+
+  .dwa-card-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .dwa-footer-text {
+    color: #94A3B8 !important;
+  }
+
+  .dwa-footer-link {
+    color: var(--dwa-brand-color, #60A5FA) !important;
+  }
+
+  .dwa-page-footer {
+    color: #64748B !important;
+
+    strong {
+      color: #94A3B8 !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   TEMA 2: SOLID LIGHT (Tema claro padrão)
+   ========================================================================== */
+
+.dwa-login-viewport.dwa-theme-light:not(.dwa-theme-glass) {
+  background: var(--dwa-custom-bg, #F8FAFC);
+  color: #0F172A !important;
+
+  .dwa-aurora-wrap {
+    display: none !important;
+  }
+
+  .dwa-login-card {
+    background: var(--dwa-card-bg, #FFFFFF) !important;
+    border: var(--dwa-card-border, 1px solid #E2E8F0) !important;
+    border-radius: var(--dwa-card-radius, 20px) !important;
+    box-shadow: var(--dwa-card-shadow, 0 10px 30px rgba(0, 0, 0, 0.06)) !important;
+    backdrop-filter: var(--dwa-card-blur, none) !important;
+    -webkit-backdrop-filter: var(--dwa-card-blur, none) !important;
+  }
+
+  .dwa-brand-title {
     color: #0F172A !important;
+  }
+
+  .dwa-brand-subtitle {
+    color: #64748B !important;
+  }
+
+  ::ng-deep .ds-input__field {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #0F172A !important;
+    border-radius: var(--dwa-input-radius, 10px) !important;
 
     &:hover:not(:disabled) {
       border-color: #CBD5E1 !important;
     }
     &:focus {
-      border-color: var(--dwa-brand-color, #D946EF) !important;
-      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18) !important;
+      border-color: var(--dwa-brand-color, #3B82F6) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
     }
     &::placeholder {
       color: #94A3B8 !important;
@@ -464,130 +522,222 @@
 
   ::ng-deep .ds-input__label {
     color: #334155 !important;
-    font-weight: 500 !important;
   }
 
   .dwa-remember-me {
-    color: #475569;
+    color: #475569 !important;
 
     .dwa-checkbox-custom {
-      background: #FFFFFF;
-      border-color: #CBD5E1;
+      background: #FFFFFF !important;
+      border: 1px solid #CBD5E1 !important;
     }
   }
 
   .dwa-forgot-link {
-    color: var(--dwa-brand-color, #7C3AED);
-  }
-
-  .dwa-password-toggle {
-    color: #94A3B8;
-    &:hover {
-      color: #475569;
-    }
+    color: var(--dwa-brand-color, #2563EB) !important;
   }
 
   .dwa-card-footer {
-    border-top-color: rgba(0, 0, 0, 0.08);
+    border-top: 1px solid #E2E8F0 !important;
   }
 
   .dwa-footer-text {
-    color: #64748B;
+    color: #64748B !important;
+  }
+
+  .dwa-footer-link {
+    color: var(--dwa-brand-color, #2563EB) !important;
   }
 
   .dwa-page-footer {
-    color: rgba(15, 23, 42, 0.6);
+    color: #94A3B8 !important;
 
     strong {
-      color: #0F172A;
+      color: #475569 !important;
     }
   }
 }
 
-/* Modo escuro dentro de tema glass quando alternado */
-.dwa-login-viewport.dwa-theme-glass.dwa-theme-dark {
-  color: #F8FAFC;
+/* ==========================================================================
+   TEMA 3: GLASS (Tabfy Forms / Apps com Papel de Parede)
+   ========================================================================== */
 
-  .dwa-theme-pill-btn {
-    border-color: rgba(255, 255, 255, 0.16);
-    background: rgba(18, 24, 38, 0.6);
+.dwa-login-viewport.dwa-theme-glass {
+  background: transparent !important;
 
-    .dwa-pill-opt {
-      color: #94A3B8;
+  .dwa-aurora-wrap {
+    display: none !important;
+  }
 
-      &.active {
-        background: rgba(255, 255, 255, 0.16);
-        color: #F8FAFC;
+  /* Modo Claro dentro de Glass (Padrão Tabfy) */
+  &.dwa-theme-light {
+    color: #0F172A !important;
+
+    .dwa-login-card {
+      background: var(--dwa-card-bg, rgba(255, 255, 255, 0.78)) !important;
+      backdrop-filter: var(--dwa-card-blur, blur(28px) saturate(180%)) !important;
+      -webkit-backdrop-filter: var(--dwa-card-blur, blur(28px) saturate(180%)) !important;
+      border: var(--dwa-card-border, 1.5px solid rgba(255, 255, 255, 0.92)) !important;
+      border-radius: var(--dwa-card-radius, 28px) !important;
+      box-shadow: var(--dwa-card-shadow, 0 25px 60px rgba(0, 0, 0, 0.08), inset 0 1.5px 2px rgba(255, 255, 255, 0.95)) !important;
+    }
+
+    .dwa-brand-title {
+      color: #0F172A !important;
+    }
+
+    .dwa-brand-subtitle {
+      color: #475569 !important;
+    }
+
+    ::ng-deep .ds-input__field {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid #E2E8F0 !important;
+      color: #0F172A !important;
+      border-radius: var(--dwa-input-radius, 14px) !important;
+
+      &:hover:not(:disabled) {
+        border-color: #CBD5E1 !important;
+      }
+      &:focus {
+        border-color: var(--dwa-brand-color, #D946EF) !important;
+        box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18) !important;
+      }
+      &::placeholder {
+        color: #94A3B8 !important;
+      }
+    }
+
+    ::ng-deep .ds-input__label {
+      color: #334155 !important;
+      font-weight: 500 !important;
+    }
+
+    .dwa-remember-me {
+      color: #475569 !important;
+
+      .dwa-checkbox-custom {
+        background: #FFFFFF !important;
+        border: 1px solid #CBD5E1 !important;
+      }
+    }
+
+    .dwa-forgot-link {
+      color: var(--dwa-brand-color, #7C3AED) !important;
+    }
+
+    .dwa-password-toggle {
+      color: #94A3B8 !important;
+      &:hover {
+        color: #475569 !important;
+      }
+    }
+
+    .dwa-card-footer {
+      border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .dwa-footer-text {
+      color: #64748B !important;
+    }
+
+    .dwa-footer-link {
+      color: var(--dwa-brand-color, #7C3AED) !important;
+    }
+
+    .dwa-page-footer {
+      color: rgba(15, 23, 42, 0.6) !important;
+
+      strong {
+        color: #0F172A !important;
       }
     }
   }
 
-  .dwa-login-card {
-    background: rgba(18, 24, 38, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.12);
-  }
-
-  .dwa-brand-title {
-    color: #F8FAFC;
-  }
-
-  .dwa-brand-subtitle {
-    color: #94A3B8;
-  }
-
-  --input-bg: rgba(26, 33, 50, 0.8);
-  --input-border: rgba(255, 255, 255, 0.14);
-  --input-border-hover: rgba(255, 255, 255, 0.28);
-  --input-border-focus: var(--dwa-brand-color, #D946EF);
-  --input-text: #F8FAFC;
-  --input-label: #E2E8F0;
-  --input-placeholder: #64748B;
-
-  ::ng-deep .ds-input__field {
-    background-color: rgba(26, 33, 50, 0.8) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
+  /* Modo Escuro dentro de Glass */
+  &.dwa-theme-dark {
     color: #F8FAFC !important;
 
-    &:hover:not(:disabled) {
-      border-color: rgba(255, 255, 255, 0.28) !important;
+    .dwa-theme-pill-btn {
+      border-color: rgba(255, 255, 255, 0.16);
+      background: rgba(18, 24, 38, 0.6);
+
+      .dwa-pill-opt {
+        color: #94A3B8;
+
+        &.active {
+          background: rgba(255, 255, 255, 0.16);
+          color: #F8FAFC;
+        }
+      }
     }
-    &:focus {
-      border-color: var(--dwa-brand-color, #D946EF) !important;
-      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.25) !important;
+
+    .dwa-login-card {
+      background: var(--dwa-card-bg, rgba(18, 24, 38, 0.75)) !important;
+      backdrop-filter: var(--dwa-card-blur, blur(28px) saturate(180%)) !important;
+      -webkit-backdrop-filter: var(--dwa-card-blur, blur(28px) saturate(180%)) !important;
+      border: var(--dwa-card-border, 1px solid rgba(255, 255, 255, 0.12)) !important;
+      border-radius: var(--dwa-card-radius, 28px) !important;
+      box-shadow: var(--dwa-card-shadow, 0 25px 60px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12)) !important;
     }
-    &::placeholder {
+
+    .dwa-brand-title {
+      color: #F8FAFC !important;
+    }
+
+    .dwa-brand-subtitle {
+      color: #94A3B8 !important;
+    }
+
+    ::ng-deep .ds-input__field {
+      background-color: rgba(26, 33, 50, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      color: #F8FAFC !important;
+      border-radius: var(--dwa-input-radius, 14px) !important;
+
+      &:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.28) !important;
+      }
+      &:focus {
+        border-color: var(--dwa-brand-color, #D946EF) !important;
+        box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.25) !important;
+      }
+      &::placeholder {
+        color: #64748B !important;
+      }
+    }
+
+    ::ng-deep .ds-input__label {
+      color: #E2E8F0 !important;
+    }
+
+    .dwa-remember-me {
+      color: #94A3B8 !important;
+
+      .dwa-checkbox-custom {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid #334155 !important;
+      }
+    }
+
+    .dwa-card-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dwa-footer-text {
+      color: #94A3B8 !important;
+    }
+
+    .dwa-footer-link {
+      color: var(--dwa-brand-color, #D946EF) !important;
+    }
+
+    .dwa-page-footer {
       color: #64748B !important;
-    }
-  }
 
-  ::ng-deep .ds-input__label {
-    color: #E2E8F0 !important;
-  }
-
-  .dwa-remember-me {
-    color: #94A3B8;
-
-    .dwa-checkbox-custom {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: #334155;
-    }
-  }
-
-  .dwa-card-footer {
-    border-top-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .dwa-footer-text {
-    color: #94A3B8;
-  }
-
-  .dwa-page-footer {
-    color: #64748B;
-
-    strong {
-      color: #94A3B8;
+      strong {
+        color: #94A3B8 !important;
+      }
     }
   }
 }

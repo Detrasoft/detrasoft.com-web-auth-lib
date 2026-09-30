@@ -94,8 +94,50 @@ export class LoginComponent implements OnInit {
   /** URL para registro/cadastro (se omitido, não exibe link de cadastro). */
   @Input() registerUrl?: string;
 
+  /** Cor primária da luz aurora (ex: '#3B82F6'). */
+  @Input() auroraPrimaryColor?: string;
+
+  /** Cor secundária da luz aurora (ex: '#8B5CF6'). */
+  @Input() auroraAccentColor?: string;
+
+  /** Cor de fundo customizada do card (ex: 'rgba(19, 25, 38, 0.9)'). */
+  @Input() cardBackground?: string;
+
+  /** Borda customizada do card. */
+  @Input() cardBorder?: string;
+
+  /** Desfoque customizado do card (ex: '20px'). */
+  @Input() cardBackdropBlur?: string;
+
+  /** Sombra customizada do card. */
+  @Input() cardBoxShadow?: string;
+
+  /** Raio das bordas dos inputs. */
+  @Input() inputRadius?: string;
+
+  /** Texto customizado do botão Entrar. */
+  @Input() buttonText?: string;
+
+  /** Exibe o link "Esqueceu a senha?". */
+  @Input() showForgotPassword?: boolean;
+
+  /** Texto do link de cadastro. */
+  @Input() registerText?: string;
+
+  /** Texto de introdução do cadastro. */
+  @Input() registerPrompt?: string;
+
+  /** Exibe o rodapé no final da página. */
+  @Input() showFooter?: boolean;
+
+  /** Texto do rodapé de segurança. */
+  @Input() footerText?: string;
+
+  /** Nome da empresa no rodapé. */
+  @Input() footerCompany?: string;
+
   /** Habilita ou desabilita a opção "Lembrar de mim". */
-  @Input() showRememberMe = true;
+  @Input() showRememberMe?: boolean;
 
   @Output() loginSuccess = new EventEmitter<AuthenticationResponse>();
   @Output() loginError = new EventEmitter<any>();
@@ -200,6 +242,85 @@ export class LoginComponent implements OnInit {
     return this.config.showThemeToggle;
   });
 
+  readonly resolvedCardBackground = computed(() => {
+    return this.cardBackground || this.config.cardBackground || '';
+  });
+
+  readonly resolvedCardBorder = computed(() => {
+    return this.cardBorder || this.config.cardBorder || '';
+  });
+
+  readonly resolvedCardBackdropBlur = computed(() => {
+    return this.cardBackdropBlur || this.config.cardBackdropBlur || '';
+  });
+
+  readonly resolvedCardBoxShadow = computed(() => {
+    return this.cardBoxShadow || this.config.cardBoxShadow || '';
+  });
+
+  readonly resolvedAuroraPrimary = computed(() => {
+    return this.auroraPrimaryColor || this.config.auroraPrimaryColor || '';
+  });
+
+  readonly resolvedAuroraAccent = computed(() => {
+    return this.auroraAccentColor || this.config.auroraAccentColor || '';
+  });
+
+  readonly resolvedInputRadius = computed(() => {
+    return this.inputRadius || this.config.inputRadius || '';
+  });
+
+  readonly resolvedButtonText = computed(() => {
+    return this.buttonText || this.config.buttonText || this.labels.loginSubmitBtn;
+  });
+
+  readonly resolvedForgotPasswordUrl = computed(() => {
+    return this.forgotPasswordUrl || this.config.forgotPasswordUrl || '';
+  });
+
+  readonly resolvedShowForgotPassword = computed(() => {
+    if (this.showForgotPassword !== undefined) return this.showForgotPassword;
+    if (this.config.showForgotPassword !== undefined) return this.config.showForgotPassword;
+    return !!this.resolvedForgotPasswordUrl();
+  });
+
+  readonly resolvedRegisterUrl = computed(() => {
+    return this.registerUrl || this.config.registerUrl || '';
+  });
+
+  readonly resolvedRegisterText = computed(() => {
+    return this.registerText || this.config.registerText || this.config.registerText || 'Criar conta';
+  });
+
+  readonly resolvedRegisterPrompt = computed(() => {
+    return this.registerPrompt || this.config.registerPrompt || 'Não tem uma conta?';
+  });
+
+  readonly resolvedShowRememberMe = computed(() => {
+    if (this.showRememberMe !== undefined) return this.showRememberMe;
+    if (this.config.showRememberMe !== undefined) return this.config.showRememberMe;
+    return true;
+  });
+
+  readonly resolvedShowFooter = computed(() => {
+    if (this.showFooter !== undefined) return this.showFooter;
+    if (this.config.showFooter !== undefined) return this.config.showFooter;
+    return true;
+  });
+
+  readonly resolvedFooterText = computed(() => {
+    return this.footerText || this.config.footerText || 'Plataforma Segura';
+  });
+
+  readonly resolvedFooterCompany = computed(() => {
+    return this.footerCompany || this.config.footerCompany || 'DetraSoft';
+  });
+
+  get themeStorageKey(): string {
+    const sw = this.resolvedSoftware();
+    return `${sw}-theme`;
+  }
+
   ngOnInit(): void {
     const savedEmail = this.auth.getSavedEmail();
     if (savedEmail) {
@@ -211,12 +332,34 @@ export class LoginComponent implements OnInit {
 
   private initTheme(): void {
     const themePref = this.resolvedTheme();
+
+    // 1. Tema explícito dark
+    if (themePref === 'dark') {
+      this.currentTheme.set('dark');
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      }
+      return;
+    }
+
+    // 2. Tema explícito light
     if (themePref === 'light') {
       this.currentTheme.set('light');
-    } else if (themePref === 'dark') {
-      this.currentTheme.set('dark');
-    } else if (themePref === 'glass') {
-      const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('tabfy-theme') : null;
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+      return;
+    }
+
+    // 3. Tema glass (Tabfy)
+    if (themePref === 'glass') {
+      const stored =
+        typeof localStorage !== 'undefined'
+          ? localStorage.getItem(this.themeStorageKey) ||
+            (this.resolvedSoftware() === 'form' ? localStorage.getItem('tabfy-theme') : null)
+          : null;
       if (stored === 'dark') {
         this.currentTheme.set('dark');
       } else {
@@ -226,21 +369,23 @@ export class LoginComponent implements OnInit {
           document.documentElement.classList.add('light');
         }
       }
+      return;
+    }
+
+    // 4. Tema auto
+    const stored =
+      typeof localStorage !== 'undefined' ? localStorage.getItem(this.themeStorageKey) : null;
+    if (stored) {
+      this.currentTheme.set(stored === 'dark' ? 'dark' : 'light');
+    } else if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) {
+      this.currentTheme.set('dark');
+    } else if (typeof document !== 'undefined' && document.documentElement.classList.contains('light')) {
+      this.currentTheme.set('light');
+    } else if (this.resolvedSoftware() === 'note' || this.resolvedSoftware() === 'task') {
+      // DutFy suite (note, task) é dark por padrão
+      this.currentTheme.set('dark');
     } else {
-      const hasDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-      const hasLight = typeof document !== 'undefined' && document.documentElement.classList.contains('light');
-      const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('tabfy-theme') : null;
-      if (stored) {
-        this.currentTheme.set(stored === 'dark' ? 'dark' : 'light');
-      } else if (hasDark) {
-        this.currentTheme.set('dark');
-      } else if (hasLight) {
-        this.currentTheme.set('light');
-      } else if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-        this.currentTheme.set('dark');
-      } else {
-        this.currentTheme.set('light');
-      }
+      this.currentTheme.set('light');
     }
   }
 
@@ -258,7 +403,10 @@ export class LoginComponent implements OnInit {
       }
     }
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('tabfy-theme', next);
+      localStorage.setItem(this.themeStorageKey, next);
+      if (this.resolvedSoftware() === 'form') {
+        localStorage.setItem('tabfy-theme', next);
+      }
     }
   }
 

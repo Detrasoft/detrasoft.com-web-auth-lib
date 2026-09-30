@@ -1,9 +1,10 @@
 <div
   class="dwa-login-viewport"
-  [class.dwa-theme-light]="isLight()"
   [class.dwa-theme-dark]="isDark()"
+  [class.dwa-theme-light]="isLight()"
   [class.dwa-theme-glass]="isGlass()"
   [class.dwa-btn-pill]="resolvedButtonPill()"
+  [class.dwa-has-gradient]="!!resolvedBrandGradient()"
   [class.dwa-bg-transparent]="resolvedBackground() === 'transparent' || isGlass()"
   [ngClass]="customClass || config.customClass"
   [style.--dwa-custom-bg]="resolvedBackground()"
@@ -11,6 +12,13 @@
   [style.--dwa-brand-color]="resolvedBrandColor()"
   [style.--dwa-card-radius]="resolvedCardRadius()"
   [style.--dwa-card-max-width]="resolvedCardMaxWidth()"
+  [style.--dwa-card-bg]="resolvedCardBackground()"
+  [style.--dwa-card-border]="resolvedCardBorder()"
+  [style.--dwa-card-blur]="resolvedCardBackdropBlur()"
+  [style.--dwa-card-shadow]="resolvedCardBoxShadow()"
+  [style.--dwa-input-radius]="resolvedInputRadius()"
+  [style.--dwa-aurora-primary]="resolvedAuroraPrimary()"
+  [style.--dwa-aurora-accent]="resolvedAuroraAccent()"
 >
   <!-- Barra Superior / Seletor de Tema (opcional) -->
   <aside *ngIf="resolvedShowThemeToggle()" class="dwa-theme-toggle-bar">
@@ -42,19 +50,24 @@
 
     <!-- Card Principal de Login -->
     <div class="dwa-login-card">
+      <!-- Slot customizado no início do card -->
+      <ng-content select="[cardHeader]"></ng-content>
+
       <!-- Cabeçalho / Identidade Visual -->
       <div class="dwa-card-header">
-        <div class="dwa-brand-icon-wrap" [class.dwa-brand-has-image]="!!resolvedLogoUrl()">
-          <img
-            *ngIf="resolvedLogoUrl(); else fontAwesomeIconTpl"
-            [src]="resolvedLogoUrl()"
-            [alt]="resolvedLogoAlt()"
-            class="dwa-brand-logo-img"
-          />
-          <ng-template #fontAwesomeIconTpl>
-            <i [class]="resolvedAppIcon()" class="dwa-brand-icon"></i>
-          </ng-template>
-        </div>
+        <ng-content select="[cardLogo]">
+          <div class="dwa-brand-icon-wrap" [class.dwa-brand-has-image]="!!resolvedLogoUrl()">
+            <img
+              *ngIf="resolvedLogoUrl(); else fontAwesomeIconTpl"
+              [src]="resolvedLogoUrl()"
+              [alt]="resolvedLogoAlt()"
+              class="dwa-brand-logo-img"
+            />
+            <ng-template #fontAwesomeIconTpl>
+              <i [class]="resolvedAppIcon()" class="dwa-brand-icon"></i>
+            </ng-template>
+          </div>
+        </ng-content>
         <h1 class="dwa-brand-title">{{ resolvedAppTitle() }}</h1>
         <p class="dwa-brand-subtitle">{{ resolvedAppSubtitle() }}</p>
       </div>
@@ -102,8 +115,11 @@
           </button>
         </div>
 
+        <!-- Slot para campos extras antes das opções -->
+        <ng-content select="[extraFields]"></ng-content>
+
         <div class="dwa-form-options">
-          <label *ngIf="showRememberMe" class="dwa-remember-me">
+          <label *ngIf="resolvedShowRememberMe()" class="dwa-remember-me">
             <input
               type="checkbox"
               [checked]="remember()"
@@ -114,8 +130,8 @@
           </label>
 
           <a
-            *ngIf="forgotPasswordUrl"
-            [routerLink]="forgotPasswordUrl"
+            *ngIf="resolvedShowForgotPassword() && resolvedForgotPasswordUrl()"
+            [routerLink]="resolvedForgotPasswordUrl()"
             class="dwa-forgot-link"
           >
             {{ labels.loginForgotPassword }}
@@ -131,7 +147,7 @@
             type="submit"
             class="dwa-submit-btn"
           >
-            {{ loading() ? 'Autenticando...' : labels.loginSubmitBtn }}
+            {{ loading() ? 'Autenticando...' : resolvedButtonText() }}
           </ds-button>
         </div>
 
@@ -139,10 +155,13 @@
         <ng-content select="[loginExtra]"></ng-content>
       </form>
 
-      <!-- Rodapé do Card -->
-      <div *ngIf="registerUrl" class="dwa-card-footer">
-        <span class="dwa-footer-text">Não tem uma conta?</span>
-        <a [routerLink]="registerUrl" class="dwa-footer-link">Criar conta</a>
+      <!-- Slot customizado antes do rodapé de registro do card -->
+      <ng-content select="[cardFooter]"></ng-content>
+
+      <!-- Rodapé do Card (Registro) -->
+      <div *ngIf="resolvedRegisterUrl()" class="dwa-card-footer">
+        <span class="dwa-footer-text">{{ resolvedRegisterPrompt() }}</span>
+        <a [routerLink]="resolvedRegisterUrl()" class="dwa-footer-link">{{ resolvedRegisterText() }}</a>
       </div>
     </div>
 
@@ -150,8 +169,10 @@
     <ng-content select="[loginFooter]"></ng-content>
 
     <!-- Rodapé Detrasoft -->
-    <footer class="dwa-page-footer">
-      <span>Plataforma Segura • Powered by <strong>DetraSoft</strong></span>
+    <footer *ngIf="resolvedShowFooter()" class="dwa-page-footer">
+      <ng-content select="[pageFooter]">
+        <span>{{ resolvedFooterText() }} • Powered by <strong>{{ resolvedFooterCompany() }}</strong></span>
+      </ng-content>
     </footer>
   </div>
 </div>
