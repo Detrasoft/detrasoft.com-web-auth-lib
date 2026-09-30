@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, tap } from 'rxjs';
 
 import { WEB_AUTH_CONFIG, ResolvedWebAuthConfig } from '../web-auth.config';
 import { AuthenticationResponse, AuthUser, UserLoginPayload } from '../models/auth.model';
@@ -25,6 +25,17 @@ export class AuthService {
   readonly accessToken = signal<string | null>(this.readInitialToken());
   readonly isAuthenticated = signal<boolean>(!!this.accessToken());
   readonly currentUser = signal<AuthUser | null>(this.readInitialUser());
+
+  /** URL anterior para retornar após autenticação bem-sucedida */
+  previousUrl: string | null = null;
+
+  /** Single-flight observable para requisições de refresh token */
+  private _refreshInFlight: Observable<string | null> | null = null;
+
+  /** Helper booleano indicando se o usuário está autenticado */
+  isLogged(): boolean {
+    return this.isAuthenticated();
+  }
 
   /**
    * Constrói a URL completa para login de acordo com o microservice `authorization-server`.
@@ -129,9 +140,79 @@ export class AuthService {
   }
 
   /**
-   * Remove tokens e encerra a sessão local.
+   * Renova o access_token usando o refresh_token no authorization-server.
+   * Single-flight com shareReplay para evitar chamadas concorrentes com refresh token rotacionado.
+   */
+  refresh(): Observable<string | null> {
+    if (this._refreshInFlight) {
+      return this._refreshInFlight;
+    }
+
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) return of(null);
+
+    const cleanBase = (this.config.baseUrl || '').replace(/\/+$/, '');
+    const cleanApiPath = (this.config.apiPath || '/authorization-server').replace(/^\/+|\/+$/g, '');
+    const refreshPath = (this.config.refreshTokenPath || '/auth/refresh_token').replace(/^\/+/, '');
+    const url = cleanApiPath ? `${cleanBase}/${cleanApiPath}/${refreshPath}` : `${cleanBase}/${refreshPath}`;
+
+    this._refreshInFlight = this.http
+      .post<AuthenticationResponse>(
+        url,
+        null,
+        { headers: { Authorization: `Bearer ${refreshToken}` } },
+      )
+      .pipe(
+        tap((res) => {
+          if (res?.access_token) {
+            this.saveSession(res, true, this.currentUser()?.email, this.config.software);
+          }
+        }),
+        map((res) => res?.access_token ?? null),
+        catchError(() => {
+          this.logout();
+          return of(null);
+        }),
+        finalize(() => {
+          this._refreshInFlight = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+
+    return this._refreshInFlight;
+  }
+
+  /**
+   * Remove tokens e encerra a sessão local e revoga no servidor.
    */
   logout(redirectRoute?: string): void {
+    const token = this.getAccessToken();
+    if (token) {
+      const cleanBase = (this.config.baseUrl || '').replace(/\/+$/, '');
+      const cleanApiPath = (this.config.apiPath || '/authorization-server').replace(/^\/+|\/+$/g, '');
+      const logoutPath = (this.config.logoutPath || '/auth/logout').replace(/^\/+/, '');
+      const url = cleanApiPath ? `${cleanBase}/${cleanApiPath}/${logoutPath}` : `${cleanBase}/${logoutPath}`;
+
+      this.http
+        .post(url, null, {
+          headers: { Authorization: `Bearer ${token}` },
+          observe: 'response',
+        })
+        .subscribe({ next: () => {}, error: () => {} });
+    }
+
+    this.clearSession();
+
+    const target = redirectRoute !== undefined ? redirectRoute : this.config.loginRoute || '/login';
+    if (target) {
+      this.router.navigateByUrl(target);
+    }
+  }
+
+  /**
+   * Limpa todos os dados de sessão do storage e zera os signals.
+   */
+  clearSession(): void {
     try {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN_ALT);
@@ -149,10 +230,10 @@ export class AuthService {
     this.accessToken.set(null);
     this.isAuthenticated.set(false);
     this.currentUser.set(null);
+  }
 
-    if (redirectRoute !== undefined) {
-      this.router.navigateByUrl(redirectRoute);
-    }
+  getToken(): string | null {
+    return this.accessToken();
   }
 
   getAccessToken(): string | null {

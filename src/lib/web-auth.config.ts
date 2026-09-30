@@ -204,6 +204,24 @@ export interface WebAuthConfig {
   /** Nome da empresa no rodapé. Padrão: 'DetraSoft'. */
   footerCompany?: string;
 
+  /** Rota da tela de login usada pelos guards. Padrão: '/login'. */
+  loginRoute?: string;
+
+  /** Rota principal pós-login para redirecionamento no guestGuard. Padrão: redirectUrlAfterLogin || '/'. */
+  homeRoute?: string;
+
+  /** Domínios autorizados a receber o Bearer token. Padrão: [/localhost/, /127\.0\.0\.1/, ...]. */
+  tokenAllowedDomains?: (string | RegExp)[];
+
+  /** Rotas que NÃO devem receber token Authorization. */
+  tokenDisallowedRoutes?: (string | RegExp)[];
+
+  /** Path do endpoint de refresh token. Padrão: '/auth/refresh_token'. */
+  refreshTokenPath?: string;
+
+  /** Path do endpoint de logout. Padrão: '/auth/logout'. */
+  logoutPath?: string;
+
   /** Classe CSS customizada opcional. */
   customClass?: string;
 
@@ -301,11 +319,36 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     showFooter: config.showFooter ?? true,
     footerText: config.footerText ?? 'Plataforma Segura',
     footerCompany: config.footerCompany ?? 'DetraSoft',
+    loginRoute: config.loginRoute ?? '/login',
+    homeRoute: config.homeRoute ?? config.redirectUrlAfterLogin ?? '/',
+    tokenAllowedDomains: config.tokenAllowedDomains ?? DEFAULT_TOKEN_ALLOWED_DOMAINS,
+    tokenDisallowedRoutes: config.tokenDisallowedRoutes ?? DEFAULT_TOKEN_DISALLOWED_ROUTES,
+    refreshTokenPath: config.refreshTokenPath ?? '/auth/refresh_token',
+    logoutPath: config.logoutPath ?? '/auth/logout',
     customClass: config.customClass ?? '',
     userSession: config.userSession,
     labels: { ...WEB_AUTH_DEFAULT_LABELS, ...config.labels },
   };
 }
+
+export const DEFAULT_TOKEN_ALLOWED_DOMAINS: (string | RegExp)[] = [
+  /localhost/,
+  /127\.0\.0\.1/,
+  /192\.168\./,
+  /10\./,
+  /\.detrasoft\.com/,
+  /\.dutfy\.app/,
+  /detrasoft/,
+  /dutfy/,
+];
+
+export const DEFAULT_TOKEN_DISALLOWED_ROUTES: (string | RegExp)[] = [
+  /\/auth\/.*\/login/,
+  /\/auth\/refresh_token/,
+  /\/auth\/new_password/,
+  /\/auth\/send_email_new_password/,
+  /\/public\/register\//,
+];
 
 /**
  * Registra a `@detrasoft.com/web-auth` no app hospedeiro.

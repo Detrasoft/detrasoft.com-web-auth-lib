@@ -17,8 +17,15 @@ export * from './lib/models/user-access.model';
 export * from './lib/models/access-profile.model';
 export * from './lib/models/auth.model';
 
+/* ── Guards ── */
+export * from './lib/guards/auth.guard';
+
+/* ── Interceptors ── */
+export * from './lib/interceptors';
+
 /* ── Services ── */
 export * from './lib/services/auth.service';
+export * from './lib/services/device-info.service';
 export * from './lib/services/user-access.service';
 export * from './lib/services/access-profile.service';
 export * from './lib/services/software.service';
