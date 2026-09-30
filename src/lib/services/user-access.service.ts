@@ -27,12 +27,27 @@ export class UserAccessService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(WEB_AUTH_CONFIG);
 
+  private get cleanBaseUrl(): string {
+    return (this.config.baseUrl || '').replace(/\/+$/, '');
+  }
+
+  private get cleanApiPath(): string {
+    return (this.config.apiPath || '/authorization-server').replace(/^\/+|\/+$/g, '');
+  }
+
+  private buildApiUrl(subpath: string): string {
+    const cleanSub = subpath.replace(/^\/+/, '');
+    return this.cleanApiPath
+      ? `${this.cleanBaseUrl}/${this.cleanApiPath}/${cleanSub}`
+      : `${this.cleanBaseUrl}/${cleanSub}`;
+  }
+
   private get resourceUrl(): string {
-    return `${this.config.baseUrl}${this.config.apiPath}/users`;
+    return this.buildApiUrl('users');
   }
 
   private get searchUrl(): string {
-    return `${this.config.baseUrl}${this.config.apiPath}/search/user`;
+    return this.buildApiUrl('search/user');
   }
 
   /**
@@ -158,9 +173,10 @@ export class UserAccessService {
    * Upload de foto de perfil (avatar público) no storage-server.
    */
   uploadAvatar(file: File, userId: string): Observable<string> {
-    const storageBase = this.config.storageBaseUrl ?? this.config.baseUrl;
-    const storagePath = this.config.storagePath ?? '/storage-server';
-    const url = `${storageBase}${storagePath}/file/public/avatar-users/${userId}/confirmed?uniqueFile=true`;
+    const storageBase = (this.config.storageBaseUrl || this.config.baseUrl || '').replace(/\/+$/, '');
+    const storagePath = (this.config.storagePath || '/storage-server').replace(/^\/+|\/+$/g, '');
+    const subpath = `file/public/avatar-users/${userId}/confirmed?uniqueFile=true`;
+    const url = storagePath ? `${storageBase}/${storagePath}/${subpath}` : `${storageBase}/${subpath}`;
 
     const formData = new FormData();
     formData.append('file', file, file.name);
@@ -178,7 +194,7 @@ export class UserAccessService {
     newPassword: string,
     confirmNewPassword?: string,
   ): Observable<void> {
-    const url = `${this.config.baseUrl}${this.config.apiPath}/auth/change_password`;
+    const url = this.buildApiUrl('auth/change_password');
     const body: ChangePasswordPayload = {
       oldPassword,
       newPassword,
@@ -193,7 +209,7 @@ export class UserAccessService {
    * Se excludeId for informado, desconsidera o usuário com esse ID (útil em edição).
    */
   checkEmailExists(email: string, excludeId?: string | null): Observable<boolean> {
-    const url = `${this.config.baseUrl}${this.config.apiPath}/public/existing-user-validation`;
+    const url = this.buildApiUrl('public/existing-user-validation');
     const params: Record<string, string> = { email: email.trim() };
     if (excludeId) {
       params['excludeId'] = excludeId;
@@ -205,7 +221,7 @@ export class UserAccessService {
    * Alteração do e-mail de acesso do usuário logado.
    */
   changeEmail(newEmail: string, password?: string): Observable<void> {
-    const url = `${this.config.baseUrl}${this.config.apiPath}/auth/change_email`;
+    const url = this.buildApiUrl('auth/change_email');
     const body: ChangeEmailPayload = {
       newEmail: newEmail.trim(),
       ...(password ? { password: password.trim() } : {}),

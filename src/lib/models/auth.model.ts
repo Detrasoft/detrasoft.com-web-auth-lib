@@ -18,11 +18,16 @@ export interface AuthenticationResponse {
 
 export interface AuthUser {
   id?: string;
+  userId?: string;
   email?: string;
   fullName?: string;
+  firstName?: string;
+  lastName?: string;
   userName?: string;
   software?: string;
   roles?: string[];
   permissions?: string[];
   avatarUrl?: string;
+  subscription?: string;
+  provider?: string;
 }

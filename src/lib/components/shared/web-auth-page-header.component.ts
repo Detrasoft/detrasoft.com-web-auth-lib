@@ -52,8 +52,11 @@ import { Router } from '@angular/router';
         gap: 0.65rem;
         padding: 1.25rem 1.5rem;
         background: var(--dwa-surface, #ffffff);
+        border: 1px solid var(--dwa-border, rgba(137, 111, 244, 0.14));
         border-radius: var(--dwa-radius-lg, 20px);
-        box-shadow: var(--dwa-shadow, 0 10px 30px rgba(42, 36, 64, 0.08));
+        box-shadow: var(--dwa-shadow, 0 10px 30px rgba(0, 0, 0, 0.08));
+        color: var(--dwa-text, #2a2440);
+        transition: all var(--dwa-transition, 180ms ease);
       }
 
       .dwa-header__head {
@@ -144,11 +147,19 @@ export class WebAuthPageHeaderComponent {
   private readonly router = inject(Router);
 
   back(): void {
+    const target = this.backLink();
+    if (target && target !== '..') {
+      void this.router.navigateByUrl(target);
+      return;
+    }
     if (history.length > 1) {
       this.location.back();
       return;
     }
-    const target = this.backLink();
-    if (target) void this.router.navigateByUrl(target);
+    if (target === '..') {
+      void this.router.navigate(['..']);
+      return;
+    }
+    void this.router.navigateByUrl('/');
   }
 }

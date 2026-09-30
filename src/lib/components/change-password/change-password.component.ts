@@ -49,7 +49,7 @@ export class ChangePasswordComponent {
   readonly title = computed(() => this.config.labels.changePasswordTitle);
   readonly eyebrow = computed(() => this.config.labels.changePasswordEyebrow);
   readonly description = computed(() => this.config.labels.changePasswordDescription);
-  readonly userDataBasePath = this.config.userDataBasePath;
+  readonly userDataBasePath = computed(() => this.config.userDataBasePath || '..');
 
   readonly changingPassword = signal(false);
   readonly currentPassword = signal('');
@@ -112,6 +112,11 @@ export class ChangePasswordComponent {
   }
 
   goBack(): void {
-    this.location.back();
+    if (history.length > 1) {
+      this.location.back();
+    } else {
+      const target = this.userDataBasePath();
+      void this.router.navigateByUrl(target && target !== '..' ? target : '/profile');
+    }
   }
 }

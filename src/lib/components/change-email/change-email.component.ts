@@ -16,11 +16,13 @@ import {
   ToastService,
 } from '@detrasoft.com/detra-ng';
 
+import { Router } from '@angular/router';
 import {
   WEB_AUTH_CONFIG,
   WEB_AUTH_USER_SESSION,
 } from '../../web-auth.config';
 import { UserAccessService } from '../../services/user-access.service';
+import { AuthService } from '../../services/auth.service';
 import { UserAccess, canUserChangeEmail } from '../../models/user-access.model';
 import { toReadableError } from '../../utils/notification.util';
 import { WebAuthPageHeaderComponent } from '../shared/web-auth-page-header.component';
@@ -28,11 +30,7 @@ import { WebAuthStateComponent } from '../shared/web-auth-state.component';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function tryGetUserIdFromStorage(): string | null {
-  if (typeof window === 'undefined' || !window.localStorage) return null;
-  const token =
-    localStorage.getItem('accessToken') ||
-    localStorage.getItem('taskui.auth.access-token.v1');
+function tryGetUserIdFromToken(token: string | null): string | null {
   if (!token) return null;
   try {
     const parts = token.split('.');
@@ -45,7 +43,7 @@ function tryGetUserIdFromStorage(): string | null {
         .join('')
     );
     const payload = JSON.parse(jsonPayload);
-    return payload?.userId ?? payload?.id ?? payload?.sub ?? null;
+    return payload?.userId ?? payload?.id ?? (payload?.sub && !payload.sub.includes('@') ? payload.sub : null);
   } catch {
     return null;
   }
@@ -69,9 +67,11 @@ function tryGetUserIdFromStorage(): string | null {
 export class ChangeEmailComponent implements OnInit, OnDestroy {
   private readonly config = inject(WEB_AUTH_CONFIG);
   private readonly userSession = inject(WEB_AUTH_USER_SESSION, { optional: true });
+  private readonly auth = inject(AuthService);
   private readonly service = inject(UserAccessService);
   private readonly toast = inject(ToastService);
   private readonly location = inject(Location);
+  private readonly router = inject(Router);
 
   readonly showHeader = input(true, {
     transform: (v: unknown) =>
@@ -81,7 +81,7 @@ export class ChangeEmailComponent implements OnInit, OnDestroy {
   readonly title = computed(() => this.config.labels.changeEmailTitle);
   readonly eyebrow = computed(() => this.config.labels.changeEmailEyebrow);
   readonly description = computed(() => this.config.labels.changeEmailDescription);
-  readonly userDataBasePath = this.config.userDataBasePath;
+  readonly userDataBasePath = computed(() => this.config.userDataBasePath || '..');
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -156,15 +156,20 @@ export class ChangeEmailComponent implements OnInit, OnDestroy {
 
   loadCurrentUser(): void {
     const session = this.userSession ?? this.config.userSession;
-    const resolvedUserId = session?.getUserId?.() ?? tryGetUserIdFromStorage();
+    const authUser = this.auth.currentUser();
+    const token = this.auth.getAccessToken();
+    const resolvedUserId =
+      session?.getUserId?.() ??
+      authUser?.userId ??
+      (authUser?.id && !authUser.id.includes('@') ? authUser.id : null) ??
+      tryGetUserIdFromToken(token);
 
     if (!resolvedUserId) {
-      const current = session?.getCurrentUser?.();
-      if (current?.email) {
+      if (authUser?.email) {
         this.currentUser.set({
-          firstName: current.firstName ?? '',
-          lastName: current.lastName ?? '',
-          email: current.email,
+          firstName: authUser.firstName ?? '',
+          lastName: authUser.lastName ?? '',
+          email: authUser.email,
         });
       }
       this.loading.set(false);
@@ -177,12 +182,11 @@ export class ChangeEmailComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: (err: unknown) => {
-        const current = session?.getCurrentUser?.();
-        if (current?.email) {
+        if (authUser?.email) {
           this.currentUser.set({
-            firstName: current.firstName ?? '',
-            lastName: current.lastName ?? '',
-            email: current.email,
+            firstName: authUser.firstName ?? '',
+            lastName: authUser.lastName ?? '',
+            email: authUser.email,
           });
         } else {
           this.error.set(toReadableError(err, 'Não foi possível carregar as credenciais da conta.'));
@@ -282,6 +286,7 @@ export class ChangeEmailComponent implements OnInit, OnDestroy {
         this.submitting.set(false);
         this.toast.success('E-mail de acesso alterado com sucesso!');
 
+        this.auth.currentUser.update(user => (user ? { ...user, email: targetEmail } : null));
         const session = this.userSession ?? this.config.userSession;
         session?.onUserUpdated?.({ email: targetEmail } as any);
 
@@ -295,6 +300,11 @@ export class ChangeEmailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back();
+    if (history.length > 1) {
+      this.location.back();
+    } else {
+      const target = this.userDataBasePath();
+      void this.router.navigateByUrl(target && target !== '..' ? target : '/profile');
+    }
   }
 }

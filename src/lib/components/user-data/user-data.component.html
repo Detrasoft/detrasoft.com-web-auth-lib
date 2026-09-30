@@ -227,7 +227,7 @@
               </div>
 
               @if (canChangeEmail()) {
-                <a [routerLink]="changeEmailPath" class="dwa-security-link">
+                <a [routerLink]="changeEmailPath()" class="dwa-security-link">
                   <ds-button variant="primary" type="button">
                     <i class="fa-solid fa-envelope me-2"></i>
                     <span>Alterar e-mail</span>
@@ -248,7 +248,7 @@
                 <p>Mantenha sua conta segura utilizando uma senha forte com letras, números e caracteres especiais.</p>
               </div>
 
-              <a [routerLink]="changePasswordPath" class="dwa-security-link">
+              <a [routerLink]="changePasswordPath()" class="dwa-security-link">
                 <ds-button variant="primary" type="button">
                   <i class="fa-solid fa-key me-2"></i>
                   <span>Alterar senha</span>

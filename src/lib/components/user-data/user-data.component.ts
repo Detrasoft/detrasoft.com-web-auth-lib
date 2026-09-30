@@ -24,17 +24,14 @@ import {
   WEB_AUTH_USER_SESSION,
 } from '../../web-auth.config';
 import { UserAccessService } from '../../services/user-access.service';
+import { AuthService } from '../../services/auth.service';
 import { WebAuthZoomService } from '../../services/zoom.service';
 import { UserAccess, UserConfigItem, SocialProvider, canUserChangeEmail } from '../../models/user-access.model';
 import { toReadableError } from '../../utils/notification.util';
 import { WebAuthPageHeaderComponent } from '../shared/web-auth-page-header.component';
 import { WebAuthStateComponent } from '../shared/web-auth-state.component';
 
-function tryGetUserIdFromStorage(): string | null {
-  if (typeof window === 'undefined' || !window.localStorage) return null;
-  const token =
-    localStorage.getItem('accessToken') ||
-    localStorage.getItem('taskui.auth.access-token.v1');
+function tryGetUserIdFromToken(token: string | null): string | null {
   if (!token) return null;
   try {
     const parts = token.split('.');
@@ -47,7 +44,7 @@ function tryGetUserIdFromStorage(): string | null {
         .join('')
     );
     const payload = JSON.parse(jsonPayload);
-    return payload?.userId ?? payload?.id ?? payload?.sub ?? null;
+    return payload?.userId ?? payload?.id ?? (payload?.sub && !payload.sub.includes('@') ? payload.sub : null);
   } catch {
     return null;
   }
@@ -73,6 +70,7 @@ function tryGetUserIdFromStorage(): string | null {
 export class UserDataComponent implements OnInit, OnDestroy {
   private readonly config = inject(WEB_AUTH_CONFIG);
   private readonly userSession = inject(WEB_AUTH_USER_SESSION, { optional: true });
+  private readonly auth = inject(AuthService);
   private readonly service = inject(UserAccessService);
   readonly zoomService = inject(WebAuthZoomService);
   private readonly toast = inject(ToastService);
@@ -87,9 +85,9 @@ export class UserDataComponent implements OnInit, OnDestroy {
   readonly title = computed(() => this.config.labels.userDataTitle);
   readonly eyebrow = computed(() => this.config.labels.userDataEyebrow);
   readonly description = computed(() => this.config.labels.userDataDescription);
-  readonly backPath = this.config.backPath;
-  readonly changePasswordPath = this.config.changePasswordBasePath;
-  readonly changeEmailPath = this.config.changeEmailBasePath;
+  readonly backPath = this.config.backPath || '';
+  readonly changePasswordPath = computed(() => this.config.changePasswordBasePath || 'change-password');
+  readonly changeEmailPath = computed(() => this.config.changeEmailBasePath || 'change-email');
   readonly enableZoom = computed(() => this.config.enableZoom);
 
   // Estados principais
@@ -181,17 +179,30 @@ export class UserDataComponent implements OnInit, OnDestroy {
   /* ── Carregamento dos dados do usuário ─────────────────────────────────── */
   private loadUserData(): void {
     const session = this.userSession ?? this.config.userSession;
-    const resolvedUserId = session?.getUserId?.() ?? tryGetUserIdFromStorage();
+    const authUser = this.auth.currentUser();
+    const token = this.auth.getAccessToken();
+    const resolvedUserId =
+      session?.getUserId?.() ??
+      authUser?.userId ??
+      (authUser?.id && !authUser.id.includes('@') ? authUser.id : null) ??
+      tryGetUserIdFromToken(token);
     this.userId.set(resolvedUserId);
 
-    const currentUser = session?.getCurrentUser?.();
-    if (currentUser?.subscription) {
-      this.subscriptionBadge.set(currentUser.subscription);
+    if (authUser?.subscription || session?.getCurrentUser?.()?.subscription) {
+      this.subscriptionBadge.set(authUser?.subscription ?? session?.getCurrentUser?.()?.subscription ?? null);
     }
 
     if (!resolvedUserId) {
-      if (currentUser) {
-        this.populateFromSession(currentUser);
+      if (authUser) {
+        this.firstName.set(authUser.firstName ?? '');
+        this.lastName.set(authUser.lastName ?? '');
+        this.email.set(authUser.email ?? '');
+        this.currentAvatarUrl.set(authUser.avatarUrl ?? null);
+        this.initialData.set({
+          firstName: this.firstName(),
+          lastName: this.lastName(),
+          urlImg: this.currentAvatarUrl(),
+        });
       }
       this.loading.set(false);
       return;
@@ -199,11 +210,11 @@ export class UserDataComponent implements OnInit, OnDestroy {
 
     this.service.getById(resolvedUserId).subscribe({
       next: (u: UserAccess) => {
-        this.firstName.set(u.firstName ?? currentUser?.firstName ?? '');
-        this.lastName.set(u.lastName ?? currentUser?.lastName ?? '');
-        this.email.set(u.email ?? currentUser?.email ?? '');
+        this.firstName.set(u.firstName ?? authUser?.firstName ?? '');
+        this.lastName.set(u.lastName ?? authUser?.lastName ?? '');
+        this.email.set(u.email ?? authUser?.email ?? '');
         this.provider.set(u.provider ?? null);
-        const rawUrl = (u.urlImg ?? currentUser?.urlImage ?? '')?.trim();
+        const rawUrl = (u.urlImg ?? authUser?.avatarUrl ?? '')?.trim();
         const validUrl = rawUrl && rawUrl !== 'null' && rawUrl !== 'undefined' ? rawUrl : null;
         this.currentAvatarUrl.set(validUrl);
         this.avatarImgError.set(false);
@@ -230,37 +241,21 @@ export class UserDataComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: (err: unknown) => {
-        if (currentUser) {
-          this.populateFromSession(currentUser);
+        if (authUser) {
+          this.firstName.set(authUser.firstName ?? '');
+          this.lastName.set(authUser.lastName ?? '');
+          this.email.set(authUser.email ?? '');
+          this.currentAvatarUrl.set(authUser.avatarUrl ?? null);
+          this.initialData.set({
+            firstName: this.firstName(),
+            lastName: this.lastName(),
+            urlImg: this.currentAvatarUrl(),
+          });
         } else {
           this.error.set(toReadableError(err, 'Não foi possível carregar os dados do usuário.'));
         }
         this.loading.set(false);
       },
-    });
-  }
-
-  private populateFromSession(user: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    urlImage?: string;
-    subscription?: string;
-  }): void {
-    this.firstName.set(user.firstName ?? '');
-    this.lastName.set(user.lastName ?? '');
-    this.email.set(user.email ?? '');
-    const rawUrl = (user.urlImage ?? '')?.trim();
-    const validUrl = rawUrl && rawUrl !== 'null' && rawUrl !== 'undefined' ? rawUrl : null;
-    this.currentAvatarUrl.set(validUrl);
-    this.avatarImgError.set(false);
-    if (user.subscription) {
-      this.subscriptionBadge.set(user.subscription);
-    }
-    this.initialData.set({
-      firstName: this.firstName(),
-      lastName: this.lastName(),
-      urlImg: this.currentAvatarUrl(),
     });
   }
 
@@ -476,5 +471,19 @@ export class UserDataComponent implements OnInit, OnDestroy {
   }): void {
     const session = this.userSession ?? this.config.userSession;
     session?.onUserUpdated?.(updated);
+
+    this.auth.currentUser.update(curr => {
+      if (!curr) return null;
+      const fn = updated.firstName !== undefined ? updated.firstName : curr.firstName;
+      const ln = updated.lastName !== undefined ? updated.lastName : curr.lastName;
+      const full = `${fn ?? ''} ${ln ?? ''}`.trim() || curr.fullName;
+      return {
+        ...curr,
+        firstName: fn,
+        lastName: ln,
+        fullName: full,
+        avatarUrl: updated.urlImage !== undefined ? updated.urlImage : curr.avatarUrl,
+      };
+    });
   }
 }

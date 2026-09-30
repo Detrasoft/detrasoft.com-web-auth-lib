@@ -1,6 +1,6 @@
 {
   "name": "@detrasoft.com/web-auth",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Usuários, acesso e perfis de acesso (permissões) para produtos Detrasoft. Consome o authorization-server e o design system @detrasoft.com/detra-ng.",
   "keywords": [
     "detrasoft",

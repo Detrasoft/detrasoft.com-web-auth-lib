@@ -37,6 +37,11 @@ export class AuthService {
     return this.isAuthenticated();
   }
 
+  /** Retorna o ID único (UUID) do usuário autenticado */
+  getUserId(): string | null {
+    return this.currentUser()?.userId || this.currentUser()?.id || null;
+  }
+
   /**
    * Constrói a URL completa para login de acordo com o microservice `authorization-server`.
    * Padrão: `{baseUrl}/{apiPath}/auth/{software}/login`
@@ -119,14 +124,24 @@ export class AuthService {
       }
 
       const decoded = this.decodeJwt(token);
+      const uuid = decoded?.userId || decoded?.id || (decoded?.sub && !decoded.sub.includes('@') ? decoded.sub : undefined);
+      const emailVal = email || (decoded?.sub && decoded.sub.includes('@') ? decoded.sub : decoded?.email);
+      const fn = decoded?.firstName || '';
+      const ln = decoded?.lastName || '';
+      const full = decoded?.name || decoded?.fullName || `${fn} ${ln}`.trim() || undefined;
+
       const user: AuthUser = {
-        id: decoded?.sub || decoded?.userId || decoded?.id,
-        email: email || decoded?.email || decoded?.sub,
-        fullName: decoded?.name || decoded?.fullName,
-        userName: decoded?.preferred_username || decoded?.username,
+        id: uuid,
+        userId: uuid,
+        email: emailVal,
+        firstName: fn || undefined,
+        lastName: ln || undefined,
+        fullName: full,
+        userName: decoded?.preferred_username || decoded?.username || emailVal,
         software: software || decoded?.software || this.config.software,
         roles: decoded?.roles || decoded?.authorities || [],
         permissions: decoded?.permissions || [],
+        avatarUrl: decoded?.urlImg || decoded?.avatarUrl || undefined,
       };
 
       storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
@@ -278,7 +293,35 @@ export class AuthService {
         localStorage.getItem(STORAGE_KEYS.USER_DATA) ||
         sessionStorage.getItem(STORAGE_KEYS.USER_DATA);
       if (raw) {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (parsed.userId || (parsed.id && !parsed.id.includes('@'))) {
+          return parsed;
+        }
+      }
+      // Re-parseia diretamente do JWT caso o storage esteja desatualizado ou com id de e-mail
+      const token = this.readInitialToken();
+      if (token) {
+        const decoded = this.decodeJwt(token);
+        if (decoded) {
+          const uuid = decoded?.userId || decoded?.id || (decoded?.sub && !decoded.sub.includes('@') ? decoded.sub : undefined);
+          const emailVal = decoded?.sub && decoded.sub.includes('@') ? decoded.sub : decoded?.email;
+          const fn = decoded?.firstName || '';
+          const ln = decoded?.lastName || '';
+          const full = decoded?.name || decoded?.fullName || `${fn} ${ln}`.trim() || undefined;
+          return {
+            id: uuid,
+            userId: uuid,
+            email: emailVal,
+            firstName: fn || undefined,
+            lastName: ln || undefined,
+            fullName: full,
+            userName: decoded?.preferred_username || decoded?.username || emailVal,
+            software: decoded?.software || this.config.software,
+            roles: decoded?.roles || decoded?.authorities || [],
+            permissions: decoded?.permissions || [],
+            avatarUrl: decoded?.urlImg || decoded?.avatarUrl || undefined,
+          };
+        }
       }
     } catch {}
     return null;
