@@ -200,7 +200,7 @@ export class AccessProfileEditorComponent implements OnInit {
     this.rolesError.set(null);
 
     forkJoin({
-      softwares: this.softwareService.listAll(),
+      softwares: this.softwareService.listAll().pipe(catchError(() => of([] as Software[]))),
       backendRoles: this.service.listRoles().pipe(catchError(() => of([] as AccessRole[]))),
     }).subscribe({
       next: ({ softwares, backendRoles }) => {
@@ -209,14 +209,39 @@ export class AccessProfileEditorComponent implements OnInit {
           if (r.code) backendRoleMap.set(r.code, r);
         }
 
+        const mappedRoleCodes = new Set<string>();
         const leaves: AccessRole[] = [];
-        const fsList: FuncoesSoftware[] = (softwares ?? []).map((s: Software) => {
-          const funcs = s.functions ?? s.funcoes ?? [];
-          const funcoes = this.buildFuncaoTree(funcs, backendRoleMap, leaves);
-          this.expandAllNodes(funcoes);
-          const sName = resolveLocalizedName(s.name, this.localeId) || s.nome || '';
-          return { softwareNome: sName, funcoes };
-        });
+        let fsList: FuncoesSoftware[] = [];
+
+        if (softwares && softwares.length > 0) {
+          fsList = softwares.map((s: Software) => {
+            const funcs = s.functions ?? s.funcoes ?? [];
+            const funcoes = this.buildFuncaoTree(funcs, backendRoleMap, leaves, mappedRoleCodes);
+            this.expandAllNodes(funcoes);
+            const sName = resolveLocalizedName(s.name, this.localeId) || s.nome || '';
+            return { softwareNome: sName, funcoes };
+          });
+        }
+
+        // Incorpora roles do backend que não estão mapeadas no software.json (ou todas caso softwares esteja vazio)
+        const unmappedRoles = (backendRoles ?? []).filter(
+          r => r.code && !mappedRoleCodes.has(r.code),
+        );
+
+        if (unmappedRoles.length > 0) {
+          const fallbackNodes = this.buildUnmappedRoleNodes(unmappedRoles, leaves);
+          const blockTitle =
+            softwares && softwares.length > 0
+              ? 'Permissões do Sistema'
+              : this.config.appName
+                ? `Permissões — ${this.config.appName}`
+                : 'Permissões do Sistema';
+
+          fsList.push({
+            softwareNome: blockTitle,
+            funcoes: fallbackNodes,
+          });
+        }
 
         this.funcoesSoftware.set(fsList);
         this.roles.set(leaves);
@@ -235,22 +260,24 @@ export class AccessProfileEditorComponent implements OnInit {
     funcoes: SoftwareFunction[],
     backendRoleMap: Map<string, AccessRole>,
     leavesAcc: AccessRole[],
+    mappedRoleCodes?: Set<string>,
   ): TreeNode[] {
     const roots = (funcoes ?? []).filter(f => f.root ?? f.raiz);
-    return roots.map(f => this.buildNodeFromFuncao(f, backendRoleMap, leavesAcc));
+    return roots.map(f => this.buildNodeFromFuncao(f, backendRoleMap, leavesAcc, mappedRoleCodes));
   }
 
   private buildNodeFromFuncao(
     funcao: SoftwareFunction,
     backendRoleMap: Map<string, AccessRole>,
     leavesAcc: AccessRole[],
+    mappedRoleCodes?: Set<string>,
   ): TreeNode {
     const children: TreeNode[] = [];
 
     const subFunctions = funcao.subFunctions ?? funcao.subFuncoes;
     if (subFunctions && subFunctions.length > 0) {
       for (const sub of subFunctions) {
-        children.push(this.buildNodeFromFuncao(sub, backendRoleMap, leavesAcc));
+        children.push(this.buildNodeFromFuncao(sub, backendRoleMap, leavesAcc, mappedRoleCodes));
       }
     }
 
@@ -266,6 +293,9 @@ export class AccessProfileEditorComponent implements OnInit {
           name: permName,
         };
         leavesAcc.push(roleData);
+        if (code && mappedRoleCodes) {
+          mappedRoleCodes.add(code);
+        }
 
         children.push({
           label: code ? `${permName} (${code})` : permName,
@@ -289,6 +319,71 @@ export class AccessProfileEditorComponent implements OnInit {
       selectable: false,
       expanded: true,
     };
+  }
+
+  private buildUnmappedRoleNodes(roles: AccessRole[], leavesAcc: AccessRole[]): TreeNode[] {
+    const groups = new Map<string, AccessRole[]>();
+
+    for (const r of roles) {
+      leavesAcc.push(r);
+      const code = (r.code ?? '').toUpperCase();
+      let cat = 'Geral';
+      if (code.startsWith('AZ1')) cat = 'Usuários';
+      else if (code.startsWith('AZ2')) cat = 'Perfis de Acesso';
+      else if (code.startsWith('AZ3')) cat = 'Permissões e Segurança';
+      else if (code.startsWith('AZ')) cat = 'Autenticação e Acesso';
+      else if (code.startsWith('PRJ')) cat = 'Projetos';
+      else if (code.startsWith('TSK')) cat = 'Tarefas';
+      else if (code.startsWith('BRD')) cat = 'Quadros & Boards';
+      else if (code.startsWith('RPT')) cat = 'Relatórios';
+      else if (code.startsWith('IMP')) cat = 'Importação de Dados';
+      else if (code.startsWith('TMS')) cat = 'Timesheets & Horas';
+      else if (code.startsWith('WKF')) cat = 'Pastas de Trabalho';
+      else if (code.startsWith('ADM')) cat = 'Administração';
+
+      if (!groups.has(cat)) {
+        groups.set(cat, []);
+      }
+      groups.get(cat)!.push(r);
+    }
+
+    const result: TreeNode[] = [];
+    for (const [catName, catRoles] of groups.entries()) {
+      result.push({
+        label: catName,
+        icon: this.getCategoryIcon(catName),
+        selectable: false,
+        expanded: true,
+        children: catRoles.map(r => ({
+          label: r.name ? `${r.name} (${r.code})` : (r.code ?? 'Permissão'),
+          data: r,
+          icon: 'fa-solid fa-key',
+          children: [],
+          selectable: true,
+          key: r.code || r.id,
+        })),
+      });
+    }
+
+    return result;
+  }
+
+  private getCategoryIcon(category: string): string {
+    switch (category) {
+      case 'Usuários': return 'fa-solid fa-users';
+      case 'Perfis de Acesso': return 'fa-solid fa-shield-halved';
+      case 'Permissões e Segurança':
+      case 'Autenticação e Acesso': return 'fa-solid fa-lock';
+      case 'Projetos': return 'fa-solid fa-folder-kanban';
+      case 'Tarefas': return 'fa-solid fa-list-check';
+      case 'Quadros & Boards': return 'fa-solid fa-table-columns';
+      case 'Relatórios': return 'fa-solid fa-chart-pie';
+      case 'Importação de Dados': return 'fa-solid fa-file-import';
+      case 'Timesheets & Horas': return 'fa-solid fa-clock';
+      case 'Pastas de Trabalho': return 'fa-solid fa-folder-open';
+      case 'Administração': return 'fa-solid fa-gear';
+      default: return 'fa-solid fa-cube';
+    }
   }
 
   private getIconByType(tipo?: string | null): string {

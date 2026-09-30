@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import { WEB_AUTH_CONFIG } from '../web-auth.config';
 
@@ -125,6 +125,8 @@ export class SoftwareService {
         if (Array.isArray(data)) return data;
         return data?.content || [];
       }),
+      catchError(() => of([] as Software[])),
     );
   }
 }
+

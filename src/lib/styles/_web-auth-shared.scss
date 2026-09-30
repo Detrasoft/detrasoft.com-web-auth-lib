@@ -53,6 +53,23 @@ html.dark,
   --dwa-primary-strong: var(--note-primary-hover, #60A5FA);
   --dwa-primary-soft: rgba(59, 130, 246, 0.14);
   --dwa-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+  /* Info / Warning / Danger / Success adaptados para tema escuro */
+  --dwa-info: #60A5FA;
+  --dwa-info-strong: #93C5FD;
+  --dwa-info-soft: rgba(96, 165, 250, 0.16);
+
+  --dwa-warning: #FBBF24;
+  --dwa-warning-strong: #FDE047;
+  --dwa-warning-soft: rgba(251, 191, 36, 0.16);
+
+  --dwa-danger: #F87171;
+  --dwa-danger-strong: #FCA5A5;
+  --dwa-danger-soft: rgba(248, 113, 113, 0.16);
+
+  --dwa-success: #34D399;
+  --dwa-success-strong: #6EE7B7;
+  --dwa-success-soft: rgba(52, 211, 153, 0.16);
 }
 
 .dwa-page {
@@ -457,32 +474,55 @@ html.dark,
   border-radius: var(--dwa-radius-md, 14px);
   background: var(--dwa-info-soft, rgba(96, 165, 250, 0.12));
   color: var(--dwa-info-strong, #1d4ed8);
+  border: 1px solid rgba(96, 165, 250, 0.25);
 
   i {
     flex: 0 0 auto;
     margin-top: 0.15rem;
+    color: var(--dwa-info, currentColor);
   }
 
   p {
     margin: 0;
     font-size: 0.85rem;
     line-height: 1.5;
+    color: inherit;
+
+    strong {
+      color: inherit;
+      filter: brightness(1.15);
+    }
   }
 }
 
 .dwa-note--warning {
   background: var(--dwa-warning-soft, rgba(234, 179, 8, 0.14));
   color: var(--dwa-warning-strong, #a16207);
+  border-color: rgba(234, 179, 8, 0.25);
+
+  i {
+    color: var(--dwa-warning, currentColor);
+  }
 }
 
 .dwa-note--danger {
   background: var(--dwa-danger-soft, rgba(248, 113, 113, 0.14));
   color: var(--dwa-danger-strong, #b91c1c);
+  border-color: rgba(248, 113, 113, 0.25);
+
+  i {
+    color: var(--dwa-danger, currentColor);
+  }
 }
 
 .dwa-note--success {
   background: var(--dwa-success-soft, rgba(34, 197, 94, 0.12));
   color: var(--dwa-success-strong, #16a34a);
+  border-color: rgba(34, 197, 94, 0.25);
+
+  i {
+    color: var(--dwa-success, currentColor);
+  }
 }
 
 .dwa-divider {

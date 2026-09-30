@@ -22,16 +22,31 @@ export class AccessProfileService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(WEB_AUTH_CONFIG);
 
+  private get cleanBaseUrl(): string {
+    return (this.config.baseUrl || '').replace(/\/+$/, '');
+  }
+
+  private get cleanApiPath(): string {
+    return (this.config.apiPath || '/authorization-server').replace(/^\/+|\/+$/g, '');
+  }
+
+  private buildApiUrl(subpath: string): string {
+    const cleanSub = subpath.replace(/^\/+/, '');
+    return this.cleanApiPath
+      ? `${this.cleanBaseUrl}/${this.cleanApiPath}/${cleanSub}`
+      : `${this.cleanBaseUrl}/${cleanSub}`;
+  }
+
   private get profilesUrl(): string {
-    return `${this.config.baseUrl}${this.config.apiPath}/profiles`;
+    return this.buildApiUrl('profiles');
   }
 
   private get searchUrl(): string {
-    return `${this.config.baseUrl}${this.config.apiPath}/search/profile`;
+    return this.buildApiUrl('search/profile');
   }
 
   private get rolesUrl(): string {
-    return `${this.config.baseUrl}${this.config.apiPath}/roles`;
+    return this.buildApiUrl('roles');
   }
 
   /**

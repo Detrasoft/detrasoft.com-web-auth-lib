@@ -38,7 +38,7 @@
   cursor: pointer;
   border-radius: var(--dwa-radius-md, 14px);
   background: var(--dwa-surface-sunken, #f3f0fb);
-  border: 1.5px solid transparent;
+  border: 1.5px solid var(--dwa-border, rgba(0, 0, 0, 0.08));
   transition:
     border-color var(--dwa-transition, 180ms ease),
     background var(--dwa-transition, 180ms ease);
@@ -52,7 +52,7 @@
   }
 
   &:hover {
-    border-color: var(--dwa-primary-soft, rgba(137, 111, 244, 0.35));
+    border-color: var(--dwa-primary, rgba(137, 111, 244, 0.5));
   }
 
   &:focus-within {
@@ -76,13 +76,13 @@
   border-radius: 7px;
   font-size: 0.68rem;
   background: var(--dwa-surface, #ffffff);
-  border: 1.5px solid var(--dwa-border-color, rgba(42, 36, 64, 0.18));
+  border: 1.5px solid var(--dwa-border, rgba(42, 36, 64, 0.25));
   color: transparent;
 
   .dwa-profile--on & {
     background: var(--dwa-primary, #896ff4);
     border-color: var(--dwa-primary, #896ff4);
-    color: var(--dwa-on-primary, #ffffff);
+    color: #ffffff;
   }
 }
 
