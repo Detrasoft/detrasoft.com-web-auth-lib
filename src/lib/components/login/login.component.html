@@ -1,17 +1,58 @@
-<div class="dwa-login-viewport">
-  <!-- Efeito Aurora e Luz de Fundo -->
-  <div class="dwa-aurora-wrap" aria-hidden="true">
+<div
+  class="dwa-login-viewport"
+  [class.dwa-theme-light]="isLight()"
+  [class.dwa-theme-dark]="isDark()"
+  [class.dwa-theme-glass]="isGlass()"
+  [class.dwa-btn-pill]="resolvedButtonPill()"
+  [ngClass]="customClass || config.customClass"
+  [style.--dwa-custom-bg]="resolvedBackground()"
+  [style.--dwa-brand-gradient]="resolvedBrandGradient()"
+  [style.--dwa-brand-color]="resolvedBrandColor()"
+  [style.--dwa-card-radius]="resolvedCardRadius()"
+  [style.--dwa-card-max-width]="resolvedCardMaxWidth()"
+>
+  <!-- Barra Superior / Seletor de Tema (opcional) -->
+  <aside *ngIf="resolvedShowThemeToggle()" class="dwa-theme-toggle-bar">
+    <button
+      type="button"
+      class="dwa-theme-pill-btn"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDark() ? 'Alternar para tema claro' : 'Alternar para tema escuro'"
+      title="Alternar tema"
+    >
+      <span class="dwa-pill-opt" [class.active]="isLight()">
+        <i class="fa-solid fa-sun"></i> Light
+      </span>
+      <span class="dwa-pill-opt" [class.active]="isDark()">
+        <i class="fa-solid fa-moon"></i> Dark
+      </span>
+    </button>
+  </aside>
+
+  <!-- Efeito Aurora e Luz de Fundo (se habilitado) -->
+  <div *ngIf="resolvedShowAurora()" class="dwa-aurora-wrap" aria-hidden="true">
     <div class="dwa-aurora dwa-aurora-primary"></div>
     <div class="dwa-aurora dwa-aurora-accent"></div>
   </div>
 
   <div class="dwa-login-container">
+    <!-- Slot customizado antes do card -->
+    <ng-content select="[loginHeader]"></ng-content>
+
     <!-- Card Principal de Login -->
     <div class="dwa-login-card">
       <!-- Cabeçalho / Identidade Visual -->
       <div class="dwa-card-header">
-        <div class="dwa-brand-icon-wrap">
-          <i [class]="resolvedAppIcon()" class="dwa-brand-icon"></i>
+        <div class="dwa-brand-icon-wrap" [class.dwa-brand-has-image]="!!resolvedLogoUrl()">
+          <img
+            *ngIf="resolvedLogoUrl(); else fontAwesomeIconTpl"
+            [src]="resolvedLogoUrl()"
+            [alt]="resolvedLogoAlt()"
+            class="dwa-brand-logo-img"
+          />
+          <ng-template #fontAwesomeIconTpl>
+            <i [class]="resolvedAppIcon()" class="dwa-brand-icon"></i>
+          </ng-template>
         </div>
         <h1 class="dwa-brand-title">{{ resolvedAppTitle() }}</h1>
         <p class="dwa-brand-subtitle">{{ resolvedAppSubtitle() }}</p>
@@ -92,6 +133,9 @@
             {{ loading() ? 'Autenticando...' : labels.loginSubmitBtn }}
           </ds-button>
         </div>
+
+        <!-- Slot customizado dentro do formulário -->
+        <ng-content select="[loginExtra]"></ng-content>
       </form>
 
       <!-- Rodapé do Card -->
@@ -100,6 +144,9 @@
         <a [routerLink]="registerUrl" class="dwa-footer-link">Criar conta</a>
       </div>
     </div>
+
+    <!-- Slot customizado após o card -->
+    <ng-content select="[loginFooter]"></ng-content>
 
     <!-- Rodapé Detrasoft -->
     <footer class="dwa-page-footer">

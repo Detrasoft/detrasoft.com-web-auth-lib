@@ -1,3 +1,8 @@
+/* ==========================================================================
+   Detrasoft Web-Auth — LoginComponent Styles
+   Supports Dark Obsidian, Light Frosted Glass, and Adaptive Theming
+   ========================================================================== */
+
 .dwa-login-viewport {
   position: relative;
   min-height: 100vh;
@@ -5,15 +10,66 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--dwa-bg, #0B0F17);
-  color: var(--dwa-text, #F8FAFC);
   overflow: hidden;
   font-family: inherit;
   padding: 1.5rem;
   box-sizing: border-box;
+
+  /* Fundo customizado se informado, fallback para dark padrão */
+  background: var(--dwa-custom-bg, #0B0F17);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #F8FAFC;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ── Fundo Atmosférico Aurora ── */
+/* ── Seletor de Tema no Topo ── */
+.dwa-theme-toggle-bar {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  z-index: 10;
+}
+
+.dwa-theme-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  .dwa-pill-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: #64748B;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.active {
+      background: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* ── Fundo Atmosférico Aurora (Dark) ── */
 .dwa-aurora-wrap {
   position: absolute;
   inset: 0;
@@ -63,25 +119,26 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 440px;
+  max-width: var(--dwa-card-max-width, 440px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
 }
 
-/* ── Card Glassmorphic ── */
+/* ── Card Base (Padrão Dark) ── */
 .dwa-login-card {
   width: 100%;
   background: rgba(19, 25, 38, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  border-radius: var(--dwa-card-radius, 20px);
   padding: 2.5rem 2.25rem;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45),
               0 0 0 1px rgba(255, 255, 255, 0.05);
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
 /* ── Header ── */
@@ -94,9 +151,9 @@
 }
 
 .dwa-brand-icon-wrap {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
   border: 1px solid rgba(59, 130, 246, 0.35);
   display: flex;
@@ -104,6 +161,23 @@
   justify-content: center;
   margin-bottom: 1.15rem;
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+
+  &.dwa-brand-has-image {
+    background: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+.dwa-brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
 }
 
 .dwa-brand-icon {
@@ -112,7 +186,7 @@
 }
 
 .dwa-brand-title {
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 700;
   margin: 0 0 0.4rem 0;
   color: #F8FAFC;
@@ -230,8 +304,8 @@
   }
 
   input[type="checkbox"]:checked + .dwa-checkbox-custom {
-    background: #3B82F6;
-    border-color: #3B82F6;
+    background: var(--dwa-brand-color, #3B82F6);
+    border-color: var(--dwa-brand-color, #3B82F6);
 
     &::after {
       opacity: 1;
@@ -244,12 +318,12 @@
 }
 
 .dwa-forgot-link {
-  color: #60A5FA;
+  color: var(--dwa-brand-color, #60A5FA);
   text-decoration: none;
   transition: color 0.15s;
 
   &:hover {
-    color: #93C5FD;
+    filter: brightness(1.2);
     text-decoration: underline;
   }
 }
@@ -261,6 +335,36 @@
 
 .dwa-submit-btn {
   width: 100%;
+}
+
+/* Customização do botão com gradiente de marca e pílula */
+.dwa-login-viewport[style*="--dwa-brand-gradient"] {
+  .dwa-submit-btn ::ng-deep button,
+  .dwa-submit-btn button {
+    background: var(--dwa-brand-gradient) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 10px 24px rgba(217, 70, 239, 0.32) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1.5px);
+      box-shadow: 0 14px 30px rgba(217, 70, 239, 0.45) !important;
+      filter: brightness(1.05);
+    }
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}
+
+.dwa-login-viewport.dwa-btn-pill {
+  .dwa-submit-btn ::ng-deep button,
+  .dwa-submit-btn button {
+    border-radius: 9999px !important;
+  }
 }
 
 /* ── Footer do Card ── */
@@ -280,7 +384,7 @@
 }
 
 .dwa-footer-link {
-  color: #60A5FA;
+  color: var(--dwa-brand-color, #60A5FA);
   text-decoration: none;
   font-weight: 500;
 
@@ -297,5 +401,188 @@
 
   strong {
     color: #94A3B8;
+  }
+}
+
+/* ==========================================================================
+   TEMA GLASS & LIGHT (Identidade Tabfy e Apps com Glassmorphism)
+   ========================================================================== */
+
+.dwa-login-viewport.dwa-theme-glass,
+.dwa-login-viewport.dwa-theme-light {
+  color: #0F172A;
+
+  .dwa-login-card {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
+  }
+
+  .dwa-brand-title {
+    color: #0F172A;
+  }
+
+  .dwa-brand-subtitle {
+    color: #475569;
+  }
+
+  /* Variáveis nos inputs do detra-ng */
+  --input-bg: rgba(255, 255, 255, 0.95);
+  --input-border: #E2E8F0;
+  --input-border-hover: #CBD5E1;
+  --input-border-focus: var(--dwa-brand-color, #D946EF);
+  --input-focus-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18);
+  --input-text: #0F172A;
+  --input-label: #334155;
+  --input-placeholder: #94A3B8;
+
+  /* Força acabamento em inputs caso detra-ng use classes diretas */
+  ::ng-deep .ds-input__field {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-color: #E2E8F0 !important;
+    color: #0F172A !important;
+
+    &:hover:not(:disabled) {
+      border-color: #CBD5E1 !important;
+    }
+    &:focus {
+      border-color: var(--dwa-brand-color, #D946EF) !important;
+      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.18) !important;
+    }
+    &::placeholder {
+      color: #94A3B8 !important;
+    }
+  }
+
+  ::ng-deep .ds-input__label {
+    color: #334155 !important;
+    font-weight: 500 !important;
+  }
+
+  .dwa-remember-me {
+    color: #475569;
+
+    .dwa-checkbox-custom {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+    }
+  }
+
+  .dwa-forgot-link {
+    color: var(--dwa-brand-color, #7C3AED);
+  }
+
+  .dwa-password-toggle {
+    color: #94A3B8;
+    &:hover {
+      color: #475569;
+    }
+  }
+
+  .dwa-card-footer {
+    border-top-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .dwa-footer-text {
+    color: #64748B;
+  }
+
+  .dwa-page-footer {
+    color: rgba(15, 23, 42, 0.6);
+
+    strong {
+      color: #0F172A;
+    }
+  }
+}
+
+/* Modo escuro dentro de tema glass quando alternado */
+.dwa-login-viewport.dwa-theme-glass.dwa-theme-dark {
+  color: #F8FAFC;
+
+  .dwa-theme-pill-btn {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(18, 24, 38, 0.6);
+
+    .dwa-pill-opt {
+      color: #94A3B8;
+
+      &.active {
+        background: rgba(255, 255, 255, 0.16);
+        color: #F8FAFC;
+      }
+    }
+  }
+
+  .dwa-login-card {
+    background: rgba(18, 24, 38, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .dwa-brand-title {
+    color: #F8FAFC;
+  }
+
+  .dwa-brand-subtitle {
+    color: #94A3B8;
+  }
+
+  --input-bg: rgba(26, 33, 50, 0.8);
+  --input-border: rgba(255, 255, 255, 0.14);
+  --input-border-hover: rgba(255, 255, 255, 0.28);
+  --input-border-focus: var(--dwa-brand-color, #D946EF);
+  --input-text: #F8FAFC;
+  --input-label: #E2E8F0;
+  --input-placeholder: #64748B;
+
+  ::ng-deep .ds-input__field {
+    background-color: rgba(26, 33, 50, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    color: #F8FAFC !important;
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.28) !important;
+    }
+    &:focus {
+      border-color: var(--dwa-brand-color, #D946EF) !important;
+      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.25) !important;
+    }
+    &::placeholder {
+      color: #64748B !important;
+    }
+  }
+
+  ::ng-deep .ds-input__label {
+    color: #E2E8F0 !important;
+  }
+
+  .dwa-remember-me {
+    color: #94A3B8;
+
+    .dwa-checkbox-custom {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #334155;
+    }
+  }
+
+  .dwa-card-footer {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dwa-footer-text {
+    color: #94A3B8;
+  }
+
+  .dwa-page-footer {
+    color: #64748B;
+
+    strong {
+      color: #94A3B8;
+    }
   }
 }

@@ -117,9 +117,50 @@ export interface WebAuthConfig {
   /** Rota de redirecionamento após login bem-sucedido. Padrão: '/'. */
   redirectUrlAfterLogin?: string;
 
+  /** URL da imagem do logo do produto (ex: '/tabfy_app_icon_light.jpg'). */
+  logoUrl?: string;
+
+  /** URL alternativa da logo para tema escuro (ex: '/tabfy_app_icon.jpg'). */
+  logoDarkUrl?: string;
+
+  /** Texto alternativo para a logo. Padrão: nome do app. */
+  logoAlt?: string;
+
+  /** Tema visual da tela de login ('auto', 'light', 'dark', 'glass'). Padrão: 'auto'. */
+  theme?: 'auto' | 'light' | 'dark' | 'glass';
+
+  /** Fundo customizado (ex: 'transparent', 'url(/background.jpg)'). */
+  background?: string;
+
+  /** Habilita ou desabilita luzes de fundo aurora. Padrão: true. */
+  showAurora?: boolean;
+
+  /** Gradiente da marca (ex: 'linear-gradient(135deg, #FF655B 0%, #D946EF 50%, #7C3AED 100%)'). */
+  brandGradient?: string;
+
+  /** Cor de destaque principal (ex: '#D946EF'). */
+  brandColor?: string;
+
+  /** Raio das bordas do card (ex: '28px'). */
+  cardRadius?: string;
+
+  /** Largura máxima do card. Padrão: '440px'. */
+  cardMaxWidth?: string;
+
+  /** Transforma o botão Entrar em pílula completa. Padrão: false. */
+  buttonPill?: boolean;
+
+  /** Exibe chave seletora Light / Dark mode na tela de login. Padrão: false. */
+  showThemeToggle?: boolean;
+
+  /** Classe CSS customizada opcional. */
+  customClass?: string;
+
   /** Sobrescrita parcial dos textos. */
   labels?: Partial<WebAuthLabels>;
 }
+
+export type WebAuthTheme = 'auto' | 'light' | 'dark' | 'glass';
 
 /** Configuração com todos os padrões já aplicados. */
 export type ResolvedWebAuthConfig = Required<Omit<WebAuthConfig, 'labels' | 'userSession'>> & {
@@ -180,6 +221,19 @@ export function resolveWebAuthConfig(config: WebAuthConfig): ResolvedWebAuthConf
     appIcon: config.appIcon ?? 'fa-solid fa-shield-halved',
     loginPath: config.loginPath ?? `/auth/${software}/login`,
     redirectUrlAfterLogin: config.redirectUrlAfterLogin ?? '/',
+    logoUrl: config.logoUrl ?? '',
+    logoDarkUrl: config.logoDarkUrl ?? '',
+    logoAlt: config.logoAlt ?? config.appName ?? 'Logo',
+    theme: config.theme ?? 'auto',
+    background: config.background ?? '',
+    showAurora: config.showAurora ?? (config.background === 'transparent' ? false : true),
+    brandGradient: config.brandGradient ?? '',
+    brandColor: config.brandColor ?? '',
+    cardRadius: config.cardRadius ?? '',
+    cardMaxWidth: config.cardMaxWidth ?? '440px',
+    buttonPill: config.buttonPill ?? false,
+    showThemeToggle: config.showThemeToggle ?? false,
+    customClass: config.customClass ?? '',
     userSession: config.userSession,
     labels: { ...WEB_AUTH_DEFAULT_LABELS, ...config.labels },
   };
